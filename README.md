@@ -34,3 +34,5 @@ repository. Any contribution should include:
 - [ ] A commented dependencies file (ex. requirements.txt)
 - [ ] All necessary `.yaml` files required for deployment
 of Kubernetes resources.
+
+Any contributions must be made via Pull Request.
