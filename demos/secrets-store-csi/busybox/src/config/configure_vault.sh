@@ -1,6 +1,6 @@
 #!/bin/bash
 
-vault kv put secret/db-pass password="sscsi-busybox-demo"
+vault kv put secret/db-pass password="demo-secret-password-123"
 vault auth enable kubernetes
 vault write auth/kubernetes/config \
   issuer="https://kubernetes.default.svc" \
@@ -15,7 +15,7 @@ path "secret/data/db-pass" {
 EOF
 
 vault write auth/kubernetes/role/database \
-  bound_service_account_names=webapp-sa \
+  bound_service_account_names=sscsi-demo-sa \
   bound_service_account_namespaces=default \
   policies=internal-app \
   ttl=20m
