@@ -29,3 +29,8 @@ install_vault_openshift() {
   oc patch daemonset vault-csi-provider --type='json' \
     -p='[{"op": "add", "path": "/spec/template/spec/containers/0/securityContext", "value": {"privileged": true} }]'
 }
+
+uninstall_vault_openshift() {
+  oc project hashicorp-vault
+  helm uninstall vault
+}

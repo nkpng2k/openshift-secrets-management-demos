@@ -16,6 +16,6 @@ EOF
 
 vault write auth/kubernetes/role/database \
   bound_service_account_names=sscsi-demo-sa \
-  bound_service_account_namespaces=default \
+  bound_service_account_namespaces=sscsi-demo-ns \
   policies=internal-app \
   ttl=20m
