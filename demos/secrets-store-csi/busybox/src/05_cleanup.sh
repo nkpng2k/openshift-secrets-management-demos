@@ -14,6 +14,8 @@ oc project default
 oc delete ClusterCSIDriver secrets-store.csi.k8s.io
 oc delete sub secrets-store-csi-driver-operator -n openshift-cluster-csi-drivers
 oc delete og secrets-store-csi-driver-og -n openshift-cluster-csi-drivers
+CSV_NAME=$(oc get csv -n openshift-cluster-csi-drivers --no-headers | awk '{ print $1 }')
+oc delete csv -n openshift-cluster-csi-drivers $CSV_NAME
 
 # Uninstall Vault via Helm
 uninstall_vault_openshift
