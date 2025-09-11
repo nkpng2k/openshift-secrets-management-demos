@@ -24,6 +24,7 @@ echo "Installing $EXTERNAL_SECRETS_REPO on OpenShift Cluster"
 
 if [[ $EXTERNAL_SECRETS_REPO == "vault" ]]; then
   install_vault_openshift
+  patch_daemonset_csi
 else
   echo "Did not recognize repo: $EXTERNAL_SECRETS_REPO"
   exit 1

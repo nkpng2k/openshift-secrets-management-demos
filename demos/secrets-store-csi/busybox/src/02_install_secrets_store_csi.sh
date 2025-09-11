@@ -11,7 +11,7 @@ source $SCRIPT_DIR/variables.sh
 oc apply -f $SCRIPT_DIR/config/operators.yaml
 
 # Verify
-sleep 2
+sleep 5
 oc get sub secrets-store-csi-driver-operator -n openshift-cluster-csi-drivers
 oc get installplan -n openshift-cluster-csi-drivers
 oc get csv -n openshift-cluster-csi-drivers

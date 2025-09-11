@@ -1,19 +1,19 @@
 apiVersion: operators.coreos.com/v1
 kind: OperatorGroup
 metadata:
-  name: secrets-store-csi-driver-og
-  namespace: openshift-cluster-csi-drivers
-spec: {}
+  name: openshift-external-secrets-operator
+  namespace: external-secrets-operator
+spec:
+  targetNamespaces: []
 ---
 apiVersion: operators.coreos.com/v1alpha1
 kind: Subscription
 metadata:
-  name: secrets-store-csi-driver-operator
-  namespace: openshift-cluster-csi-drivers
+  name: openshift-external-secrets-operator
+  namespace: external-secrets-operator
 spec:
-  channel: stable
-  installPlanApproval: Automatic
-  name: secrets-store-csi-driver-operator
+  channel: tech-preview-v0.1
+  name: openshift-external-secrets-operator
   source: redhat-operators
   sourceNamespace: openshift-marketplace
-  
+  installPlanApproval: Automatic

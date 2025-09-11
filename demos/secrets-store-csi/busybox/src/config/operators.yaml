@@ -16,4 +16,3 @@ spec:
   name: secrets-store-csi-driver-operator
   source: redhat-operators
   sourceNamespace: openshift-marketplace
-  

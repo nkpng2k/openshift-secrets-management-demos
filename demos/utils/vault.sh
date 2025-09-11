@@ -24,7 +24,9 @@ install_vault_openshift() {
   helm install \
     -n hashicorp-vault vault hashicorp/vault \
     --values $SCRIPT_DIR/config/tmp_vault_values.yaml
+}
 
+patch_daemonset_csi() {
   # Patch daemonset due to bug in Vault CSI Manifest
   oc patch daemonset vault-csi-provider --type='json' \
     -p='[{"op": "add", "path": "/spec/template/spec/containers/0/securityContext", "value": {"privileged": true} }]'
