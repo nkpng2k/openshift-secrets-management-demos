@@ -13,8 +13,6 @@ install_vault_openshift() {
   # NOTE: Must have `oc`` installed and logged in with admin privileges
   oc new-project hashicorp-vault
   oc project hashicorp-vault
-  oc adm policy add-scc-to-user privileged \
-    system:serviceaccount:hashicorp-vault:vault-csi-provider
 
   sed \
     -e "s|VAULT_IMAGE_REPO|$VAULT_IMAGE_REPO|g" \
@@ -30,6 +28,9 @@ patch_daemonset_csi() {
   # Patch daemonset due to bug in Vault CSI Manifest
   oc patch daemonset vault-csi-provider --type='json' \
     -p='[{"op": "add", "path": "/spec/template/spec/containers/0/securityContext", "value": {"privileged": true} }]'
+  # add privilege to daemonset service account
+  oc adm policy add-scc-to-user privileged \
+    system:serviceaccount:hashicorp-vault:vault-csi-provider
 }
 
 uninstall_vault_openshift() {
