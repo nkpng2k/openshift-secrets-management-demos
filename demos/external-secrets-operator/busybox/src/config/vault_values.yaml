@@ -1,0 +1,12 @@
+global:
+  openshift: true
+csi:
+  enabled: false
+injector:
+  enabled: false
+server:
+  image:
+    repository: VAULT_IMAGE_REPO
+    tag: VAULT_IMAGE_TAG
+  dev:
+    enabled: true
