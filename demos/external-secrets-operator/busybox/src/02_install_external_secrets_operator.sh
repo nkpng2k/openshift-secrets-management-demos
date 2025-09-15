@@ -4,7 +4,7 @@
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 DEMO_SRC_DIR="external-secrets-operator/busybox/src"
 UTILS_DIR=$(sed "s|$DEMO_SRC_DIR|utils|g" <<< "$SCRIPT_DIR")
-source $UTILS_DIR/vault.sh
+source $UTILS_DIR/*
 source $SCRIPT_DIR/variables.sh
 
 # Create new demo project
@@ -18,8 +18,9 @@ oc apply -f $SCRIPT_DIR/config/operators.yaml
 sleep 5
 oc get sub openshift-external-secrets-operator -n external-secrets-operator
 oc get installplan -n external-secrets-operator
-oc get csv -n external-secrets-operator
-oc get pods -n external-secrets-operator
+await_csv_ready external-secrets-operator
+POD_NAME=$(get_pod_name external-secrets-operator)
+await_pod_ready $POD_NAME external-secrets-operator
 
 # Deploy
 oc apply -f $SCRIPT_DIR/config/eso.yaml
