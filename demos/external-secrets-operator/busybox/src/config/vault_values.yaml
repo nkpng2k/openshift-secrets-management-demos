@@ -2,6 +2,9 @@ global:
   openshift: true
 csi:
   enabled: false
+  image:
+    repository: VAULT_CSI_IMAGE_REPO
+    tag: VAULT_CSI_IMAGE_TAG
 injector:
   enabled: false
 server:

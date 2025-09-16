@@ -18,7 +18,7 @@ Must have admin credentials for an OpenShift cluster and be logged in via:
 1. Make sure to have `oc` and `helm` installed
 2. Make sure to log in with your admin credentials via `oc login` command
 3. You can make edits to the `variables.sh` file if you want to configure
-where to point the demo to for some things. 
+where to point the demo to for some things.
 4. Run the scripts in order from the `src` folder:
 ```sh
 # Installs the external secrets manager. Vault is currently the only supported
@@ -42,3 +42,10 @@ where to point the demo to for some things.
 This is not guaranteed to work in all environments, and is meant to showcase
 an extremely simple example of how Secrets Store CSI can consume secrets from
 an external secret manager.
+
+## Known issue:
+
+There is a known bug with the Vault helm charts that results in an `ImagePullBackoff`
+error on the `vault-csi-provider` pod. [link](https://github.com/hashicorp/vault-helm/issues/1140)
+
+This error can be ignored and does not impact the demo.
