@@ -1,0 +1,19 @@
+#!/bin/bash
+
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+DEMO_SRC_DIR="cert-manager/busybox/src"
+UTILS_DIR=$(sed "s|$DEMO_SRC_DIR|utils|g" <<< "$SCRIPT_DIR")
+source $UTILS_DIR/*
+
+# Create new demo project
+oc new-project cert-manager-operator
+oc project cert-manager-operator
+
+# Create Operator Group and Subscription
+oc apply -f $SCRIPT_DIR/config/operators.yaml
+
+# Verify Operator
+sleep 5
+await_csv_ready cert-manager-operator
+POD_NAME=$(get_pod_name cert-manager-operator)
+await_pod_ready $POD_NAME cert-manager-operator
