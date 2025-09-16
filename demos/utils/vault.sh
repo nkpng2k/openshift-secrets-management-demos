@@ -21,6 +21,7 @@ install_vault_openshift() {
 
   helm install \
     -n hashicorp-vault vault hashicorp/vault \
+    --version 0.30.1 \
     --values $SCRIPT_DIR/config/tmp_vault_values.yaml
 }
 
