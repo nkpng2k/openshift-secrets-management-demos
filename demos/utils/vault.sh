@@ -17,6 +17,8 @@ install_vault_openshift() {
   sed \
     -e "s|VAULT_IMAGE_REPO|$VAULT_IMAGE_REPO|g" \
     -e "s|VAULT_IMAGE_TAG|$VAULT_IMAGE_TAG|g" \
+    -e "s|VAULT_CSI_IMAGE_REPO|$VAULT_CSI_IMAGE_REPO|g" \
+    -e "s|VAULT_CSI_IMAGE_TAG|$VAULT_CSI_IMAGE_TAG|g" \
     $SCRIPT_DIR/config/vault_values.yaml > $SCRIPT_DIR/config/tmp_vault_values.yaml
 
   helm install \
