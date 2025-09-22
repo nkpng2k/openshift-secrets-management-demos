@@ -24,7 +24,7 @@ where to point the demo to for some things.
 # Installs the external secrets manager. Vault is currently the only supported
 ./01_install_external_secrets_repo.sh
 
-# Installs Secrets Store CSI and necessary configurations
+# Installs External Secrets Operator and necessary configurations
 ./02_install_external_secrets_operator.sh
 
 # Configures the running Vault with some dummy values and enables Kubernetes auth
