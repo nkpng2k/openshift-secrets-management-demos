@@ -49,8 +49,7 @@ spec:
     - server auth
     - client auth
   dnsNames:
-  - "test-server.cert-manager-demo-ns.svc.cluster.local"
-  - "test-server"
+  - DNS_HOST
   issuerRef:
     name: test-ca-issuer
 ---
@@ -66,7 +65,6 @@ spec:
     - server auth
     - client auth
   dnsNames:
-  - "test-client.cert-manager-demo-ns.svc.cluster.local"
-  - "test-client"
+  - DNS_HOST
   issuerRef:
     name: test-ca-issuer

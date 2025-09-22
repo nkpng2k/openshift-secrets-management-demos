@@ -1,67 +1,64 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  labels:
-    app: hello
-  name: hello-demo
+  name: hello-openshift-ingress
   namespace: cert-manager-demo-ns
 spec:
-  replicas: 1
   selector:
     matchLabels:
-      app: hello
+      deployment: hello-openshift-ingress
   template:
     metadata:
       labels:
-        app: hello
+        deployment: hello-openshift-ingress
     spec:
       containers:
-      - name: hello-demo
-        image: openopenshift/hello-openshift
-        imagePullPolicy: IfNotPresent
+      - name: hello-openshift-ingress
+        image: openshift/hello-openshift:v3.9.0
         ports:
-        - containerPort: 6061
-        readinessProbe:
-          httpGet:
-            path: /
-            port: 6061
-          initialDelaySeconds: 5
-          periodSeconds: 5
-          successThreshold: 1
+        - containerPort: 8080
+          protocol: TCP
+        - containerPort: 8888
+          protocol: TCP
+        resources: {}
 ---
 apiVersion: v1
 kind: Service
 metadata:
-    name: hello-service
-    namespace: cert-manager-demo-ns
+  name: hello-openshift-ingress
+  namespace: cert-manager-demo-ns
 spec:
-    selector:
-      app: hello
-    ports:
-    - name: http
-      protocol: TCP
-      port: 6061
-      targetPort: 6061
+  selector:
+    deployment: hello-openshift-ingress
+  ports:
+  - name: 8080-tcp
+    port: 8080
+    protocol: TCP
+    targetPort: 8080
+  - name: 8888-tcp
+    port: 8888
+    protocol: TCP
+    targetPort: 8888
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-    name: hello-ingress
-    namespace: cert-manager-demo-ns
-    annotations:
-      cert-manager.io/issuer: test-ca-issuer
+  annotations:
+    cert-manager.io/issuer: test-ca-issuer
+  name: hello-openshift-ingress
 spec:
-    rules:
-    - http:
+  rules:
+    - host: DNS_HOST
+      http:
         paths:
-        - path: /test
-          pathType: Prefix
-          backend:
-            service:
-              name: hello-service
-              port:
-                number: 6061
-    tls: 
+          - pathType: "Prefix"
+            path: "/"
+            backend:
+              service:
+                name: hello-openshift-ingress
+                port:
+                  number: 8080
+  tls:
     - hosts:
-      - test-server
-      secretName: test-server
+        - DNS_HOST
+      secretName: test-server-tls
