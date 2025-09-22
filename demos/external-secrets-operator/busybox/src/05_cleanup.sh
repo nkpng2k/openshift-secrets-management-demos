@@ -14,8 +14,8 @@ oc project default
 oc delete clusterrolebinding eso-demo-crb
 
 # Clean up operator group and subscription
-oc delete sub openshift-external-secrets-operator -n openshift-cluster-csi-drivers
-oc delete og openshift-external-secrets-operator -n openshift-cluster-csi-drivers
+oc delete sub openshift-external-secrets-operator -n external-secrets-operator
+oc delete og openshift-external-secrets-operator -n external-secrets-operator
 CSV_NAME=$(oc get csv -n external-secrets-operator --no-headers | awk '{ print $1 }')
 oc delete csv -n external-secrets-operator $CSV_NAME
 
