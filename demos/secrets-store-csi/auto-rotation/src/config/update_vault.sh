@@ -1,3 +1,3 @@
 #!/bin/bash
 
-vault kv put secret/db-pass password="demo-rotated-password-456"
+vault kv put secret/db-pass password="NEW_PASS"

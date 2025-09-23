@@ -8,6 +8,18 @@ to the secret. When the secret is updated upstream,
 Secret Store CSI will update the secret within the running
 pod.
 
+## About auto-rotation
+
+Secrets store csi has the ability to automatically rotate the secrets
+mounted to running workloads when the secret is updated in the upstream
+secrets management software (for example: Vault). Auto-rotation is enabled
+by default for the Red Hat OpenShift version of Secrets Store CSI, and
+you can find a list of providers that support automatic rotation
+[here](https://secrets-store-csi-driver.sigs.k8s.io/providers).
+
+By default, the polling period for automatic rotation is 2 minutes, but
+this can be changed if shorter (or longer) polling periods are required.
+
 ## Prerequisites
 
 Must have the following installed:
@@ -37,8 +49,11 @@ where to point the demo to for some things.
 # Deploys a sample application and performs a simple validation
 ./04_deploy_example_application.sh
 
+# Update secret in Vault and wait for SSCSI notice the secret change
+./05_demo_auto_rotation.sh
+
 # Cleanup step. Tearsdown the resources created during the prior steps
-./05_cleanup.sh
+./06_cleanup.sh
 ```
 
 ## Disclaimer
