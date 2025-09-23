@@ -3,9 +3,19 @@
 # source variables and util functions
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
+# Add RBAC permissions for router to read referenced secrets
+oc create role secret-reader \
+  --verb=get,list,watch \
+  --resource=secrets \
+  --resource-name=test-server-tls
+
+oc create rolebinding secret-reader-binding \
+  --role=secret-reader \
+  --serviceaccount=openshift-ingress:router
+
 # Get OpenShift DNS name
 BASE_DOMAIN=$(oc get dns/cluster -o=jsonpath='{.spec.baseDomain}')
-APP_PREFIX=hello-openshift-ingress
+APP_PREFIX=hello-openshift-route
 HOST=${APP_PREFIX}.apps.${BASE_DOMAIN}
 
 sed \

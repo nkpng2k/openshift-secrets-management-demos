@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: hello-openshift-ingress
+  name: hello-openshift-route
   namespace: cert-manager-demo-ns
 spec:
   selector:
     matchLabels:
-      deployment: hello-openshift-ingress
+      deployment: hello-openshift-route
   template:
     metadata:
       labels:
-        deployment: hello-openshift-ingress
+        deployment: hello-openshift-route
     spec:
       containers:
-      - name: hello-openshift-ingress
+      - name: hello-openshift-route
         image: openshift/hello-openshift:v3.9.0
         ports:
         - containerPort: 8080
@@ -25,11 +25,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: hello-openshift-ingress
+  name: hello-openshift-route
   namespace: cert-manager-demo-ns
 spec:
   selector:
-    deployment: hello-openshift-ingress
+    deployment: hello-openshift-route
   ports:
   - name: 8080-tcp
     port: 8080
@@ -40,25 +40,15 @@ spec:
     protocol: TCP
     targetPort: 8888
 ---
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+apiVersion: route.openshift.io/v1
+kind: Route
 metadata:
-  annotations:
-    cert-manager.io/issuer: test-ca-issuer
-  name: hello-openshift-ingress
+  name: hello-openshift-route
 spec:
-  rules:
-    - host: DNS_HOST
-      http:
-        paths:
-          - pathType: "Prefix"
-            path: "/"
-            backend:
-              service:
-                name: hello-openshift-ingress
-                port:
-                  number: 8080
+  host: DNS_HOST
+  to:
+    kind: Service
+    name: hello-openshift-route
   tls:
-    - hosts:
-        - DNS_HOST
-      secretName: test-server-tls
+    externalCertificate:
+      name: test-server-tls

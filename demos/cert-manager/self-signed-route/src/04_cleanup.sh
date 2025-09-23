@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Clean up RBAC permissions
+oc delete rolebinding secret-reader-binding
+oc delete role secret-reader
+
 # Clean up demo namespace. This cleans up any resources in the namespace
 oc delete project cert-manager-demo-ns
 oc project default

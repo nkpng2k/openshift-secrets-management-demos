@@ -9,7 +9,7 @@ oc project cert-manager-demo-ns
 
 # Get OpenShift DNS name
 BASE_DOMAIN=$(oc get dns/cluster -o=jsonpath='{.spec.baseDomain}')
-APP_PREFIX=hello-openshift-ingress
+APP_PREFIX=hello-openshift-route
 HOST=${APP_PREFIX}.apps.${BASE_DOMAIN}
 
 sed \
