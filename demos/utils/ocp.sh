@@ -2,13 +2,14 @@
 
 # Utility function for getting pod name in ns
 # NOTE: only 1 pod is expected to be running in the ns
+# $1: pod name to grep
 # $1: pod namespace
 get_pod_name() {
 
-  while [[ $(oc get pods -n $1) == "" ]]; do
+  while [[ $(oc get pods -n $2 | grep $1) == "" ]]; do
     sleep 1
   done
-  echo $(oc get pods -n $1 --no-headers | awk '{ print $1 }')
+  echo $(oc get pods -n $2 --no-headers | grep $1 | awk '{ print $1 }')
 }
 
 # Utility function for inspecting pod readiness
@@ -31,6 +32,27 @@ await_csv_ready() {
     sleep 1
   done
   echo "csv ready"
+}
+
+# Utility function to wait for some period of time
+# $1: number of seconds to wait
+wait_spinner() {
+  printf "Waiting for $1 seconds\n"
+  EraseToEOL=$(tput el)
+  max=$((SECONDS + $1))
+
+  while [ $SECONDS -le ${max} ]
+  do
+    msg='Waiting'
+    for i in {1..5}
+    do
+      printf "%s" "${msg}"
+      msg='.'
+      sleep 1
+    done
+    printf "\r${EraseToEOL}"
+  done
+  printf "\n"
 }
 
 # Helper functions
