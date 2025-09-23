@@ -1,4 +1,4 @@
-# Self-Signed Demo
+# Self-Signed Demo for OpenShift Routes
 
 This is a simple demo using the `hello-openshift` container image
 to consume a cert-manager generated tls certificate.
