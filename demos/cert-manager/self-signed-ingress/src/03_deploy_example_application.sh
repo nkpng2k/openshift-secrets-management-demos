@@ -14,7 +14,7 @@ sed \
 oc apply -f $SCRIPT_DIR/config/tmp_cert_manager_example.yaml
 
 # Wait a bit for the deployment to be ready
-sleep 10
+wait_spinner 15
 
 # Run test with curl
 curl --cacert <(oc get secret -n cert-manager-demo-ns test-client-tls -o jsonpath='{.data.ca\.crt}' | base64 -d) \

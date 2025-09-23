@@ -11,7 +11,7 @@ oc create serviceaccount -n sscsi-demo-ns sscsi-demo-sa
 oc apply -f $SCRIPT_DIR/config/sscsi_resources.yaml
 
 # Wait a bit and then validate secret is mounted
-sleep 10
+wait_spinner 10
 MOUNTED_SECRET=$(oc exec -it -n sscsi-demo-ns sscsi-demo -- cat mnt/secrets-store/db-password)
 echo "The secret mounted into the pod is: $MOUNTED_SECRET"
 if [[ $MOUNTED_SECRET == "demo-secret-password-123" ]]; then

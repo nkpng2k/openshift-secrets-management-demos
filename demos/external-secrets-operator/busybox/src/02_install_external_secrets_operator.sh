@@ -15,7 +15,7 @@ oc project external-secrets-operator
 oc apply -f $SCRIPT_DIR/config/operators.yaml
 
 # Verify Operator
-sleep 5
+wait_spinner 5
 oc get sub openshift-external-secrets-operator -n external-secrets-operator
 oc get installplan -n external-secrets-operator
 await_csv_ready external-secrets-operator
@@ -26,7 +26,7 @@ await_pod_ready $POD_NAME external-secrets-operator
 oc apply -f $SCRIPT_DIR/config/eso.yaml
 
 # Verify
-sleep 5
+wait_spinner 5
 oc get pods -n external-secrets
 oc get externalsecrets.operator.openshift.io cluster \
   -n external-secrets-operator \

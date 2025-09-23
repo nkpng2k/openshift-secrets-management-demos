@@ -13,7 +13,7 @@ oc project cert-manager-operator
 oc apply -f $SCRIPT_DIR/config/operators.yaml
 
 # Verify Operator
-sleep 5
+wait_spinner 5
 await_csv_ready cert-manager-operator
 POD_NAME=$(get_pod_name cert cert-manager-operator)
 await_pod_ready $POD_NAME cert-manager-operator

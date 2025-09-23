@@ -34,6 +34,27 @@ await_csv_ready() {
   echo "csv ready"
 }
 
+# Utility function to wait for some period of time
+# $1: number of seconds to wait
+wait_spinner() {
+  printf "Waiting for $1 seconds\n"
+  EraseToEOL=$(tput el)
+  max=$((SECONDS + $1))
+
+  while [ $SECONDS -le ${max} ]
+  do
+    msg='Waiting'
+    for i in {1..5}
+    do
+      printf "%s" "${msg}"
+      msg='.'
+      sleep 1
+    done
+    printf "\r${EraseToEOL}"
+  done
+  printf "\n"
+}
+
 # Helper functions
 get_pod_status() {
   echo $(oc get pods $1 \

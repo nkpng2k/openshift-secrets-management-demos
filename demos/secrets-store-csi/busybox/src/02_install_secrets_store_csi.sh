@@ -10,7 +10,7 @@ source $UTILS_DIR/ocp.sh
 oc apply -f $SCRIPT_DIR/config/operators.yaml
 
 # Verify
-sleep 5
+wait_spinner 5
 oc get sub secrets-store-csi-driver-operator -n openshift-cluster-csi-drivers
 oc get installplan -n openshift-cluster-csi-drivers
 await_csv_ready openshift-cluster-csi-drivers
