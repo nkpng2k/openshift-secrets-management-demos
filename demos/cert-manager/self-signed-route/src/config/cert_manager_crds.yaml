@@ -1,0 +1,70 @@
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: selfsigned-issuer
+  namespace: cert-manager-demo-ns
+spec:
+  selfSigned: {}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: test-ca
+  namespace: cert-manager-demo-ns
+spec:
+  isCA: true
+  commonName: test-ca
+  subject:
+    organizations:
+      - ACME Inc.
+    organizationalUnits:
+      - Widgets
+  secretName: test-ca-secret
+  privateKey:
+    algorithm: ECDSA
+    size: 256
+  issuerRef:
+    name: selfsigned-issuer
+    kind: Issuer
+    group: cert-manager.io
+---
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: test-ca-issuer
+  namespace: cert-manager-demo-ns
+spec:
+  ca:
+    secretName: test-ca-secret
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: test-server
+  namespace: cert-manager-demo-ns
+spec:
+  secretName: test-server-tls
+  isCA: false
+  usages:
+    - server auth
+    - client auth
+  dnsNames:
+  - DNS_HOST
+  issuerRef:
+    name: test-ca-issuer
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: test-client
+  namespace: cert-manager-demo-ns
+spec:
+  secretName: test-client-tls
+  isCA: false
+  usages:
+    - server auth
+    - client auth
+  dnsNames:
+  - DNS_HOST
+  issuerRef:
+    name: test-ca-issuer
