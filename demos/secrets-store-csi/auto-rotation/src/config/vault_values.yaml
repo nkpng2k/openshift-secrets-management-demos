@@ -1,0 +1,21 @@
+global:
+  openshift: true
+csi:
+  enabled: true
+  daemonSet:
+    providersDir: /var/run/secrets-store-csi-providers
+  image:
+    repository: VAULT_CSI_IMAGE_REPO
+    tag: VAULT_CSI_IMAGE_TAG
+  agent:
+    image:
+      repository: VAULT_IMAGE_REPO
+      tag: VAULT_IMAGE_TAG
+injector:
+  enabled: false
+server:
+  image:
+    repository: VAULT_IMAGE_REPO
+    tag: VAULT_IMAGE_TAG
+  dev:
+    enabled: true
