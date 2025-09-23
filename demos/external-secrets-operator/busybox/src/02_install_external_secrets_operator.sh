@@ -19,7 +19,7 @@ sleep 5
 oc get sub openshift-external-secrets-operator -n external-secrets-operator
 oc get installplan -n external-secrets-operator
 await_csv_ready external-secrets-operator
-POD_NAME=$(get_pod_name external-secrets-operator)
+POD_NAME=$(get_pod_name external external-secrets-operator)
 await_pod_ready $POD_NAME external-secrets-operator
 
 # Deploy

@@ -2,13 +2,14 @@
 
 # Utility function for getting pod name in ns
 # NOTE: only 1 pod is expected to be running in the ns
+# $1: pod name to grep
 # $1: pod namespace
 get_pod_name() {
 
-  while [[ $(oc get pods -n $1) == "" ]]; do
+  while [[ $(oc get pods -n $2 | grep $1) == "" ]]; do
     sleep 1
   done
-  echo $(oc get pods -n $1 --no-headers | awk '{ print $1 }')
+  echo $(oc get pods -n $2 --no-headers | grep $1 | awk '{ print $1 }')
 }
 
 # Utility function for inspecting pod readiness
