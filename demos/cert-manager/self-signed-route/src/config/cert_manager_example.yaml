@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-openshift-route
+  namespace: cert-manager-demo-ns
+spec:
+  selector:
+    matchLabels:
+      deployment: hello-openshift-route
+  template:
+    metadata:
+      labels:
+        deployment: hello-openshift-route
+    spec:
+      containers:
+      - name: hello-openshift-route
+        image: openshift/hello-openshift:v3.9.0
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        - containerPort: 8888
+          protocol: TCP
+        resources: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hello-openshift-route
+  namespace: cert-manager-demo-ns
+spec:
+  selector:
+    deployment: hello-openshift-route
+  ports:
+  - name: 8080-tcp
+    port: 8080
+    protocol: TCP
+    targetPort: 8080
+  - name: 8888-tcp
+    port: 8888
+    protocol: TCP
+    targetPort: 8888
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: hello-openshift-route
+spec:
+  host: DNS_HOST
+  to:
+    kind: Service
+    name: hello-openshift-route
+  tls:
+    externalCertificate:
+      name: test-server-tls
