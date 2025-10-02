@@ -35,9 +35,26 @@ where to point the demo to for some things.
 # Deploys a sample application and performs a simple validation
 ./04_deploy_example_application.sh
 
+# Updates the secret in Vault and waits for update to be pulled by ESO
+./05_demo_eso_refresh_policies.sh
+
+# Deletes the secret in Vault and waits for update to be pulled by ESO
+./06_demo_eso_deletion_policies.sh
+
 # Cleanup step. Tearsdown the resources created during the prior steps
-./05_cleanup.sh
+./07_cleanup.sh
 ```
+
+## Expected Output
+1. At step 4, you should see success statements echoed to the terminal
+2. At step 5, you should see success statements. Additionally, the
+secret mounted as an Environment Variable will not have changed, but
+the secret mounted to the pod as a volume will reflect the change to
+Vault.
+3. At step 6, you should see output logs for events attached to the
+`ExternalSecret` CR. Additionally, you should see a success message
+echoed to the terminal asserting the secret managed by the
+`ExternalSecret` has been deleted.
 
 ## Disclaimer
 
