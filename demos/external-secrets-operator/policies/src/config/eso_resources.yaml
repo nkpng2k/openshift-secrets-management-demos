@@ -30,11 +30,15 @@ metadata:
   name: vault-external-secret
   namespace: eso-demo-ns
 spec:
+  refreshPolicy: Periodic
+  refreshInterval: 1m   
   secretStoreRef:
     name: vault-backend
     kind: SecretStore
   target:
     name: vault-secret-example
+    deletionPolicy: Delete
+    creationPolicy: Owner # This is the default
   data:
   - secretKey: password
     remoteRef:
