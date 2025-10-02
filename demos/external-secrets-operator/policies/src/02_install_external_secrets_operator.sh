@@ -2,9 +2,9 @@
 
 # source variables and util functions
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-DEMO_SRC_DIR="external-secrets-operator/busybox/src"
+DEMO_SRC_DIR="external-secrets-operator/policies/src"
 UTILS_DIR=$(sed "s|$DEMO_SRC_DIR|utils|g" <<< "$SCRIPT_DIR")
-source $UTILS_DIR/*
+source $UTILS_DIR/ocp.sh
 source $SCRIPT_DIR/variables.sh
 
 # Create new demo project
@@ -26,8 +26,4 @@ await_pod_ready $POD_NAME external-secrets-operator
 oc apply -f $SCRIPT_DIR/config/eso.yaml
 
 # Verify
-wait_spinner 5
-oc get pods -n external-secrets
-oc get externalsecrets.operator.openshift.io cluster \
-  -n external-secrets-operator \
-  -o jsonpath='{.status.conditions}' | jq .
+await_all_resources_ready external-secrets pod
