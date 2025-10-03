@@ -21,11 +21,8 @@ Must have admin credentials for an OpenShift cluster and be logged in via:
 where to point the demo to for some things.
 4. Run the scripts in order from the `src` folder:
 ```sh
-# Installs the external secrets manager. Vault is currently the only supported
-./01_install_external_secrets_repo.sh
-
-# Installs External Secrets Operator and necessary configurations
-./02_install_external_secrets_operator.sh
+# Installs the external secrets manager (Vault) and External Secret Operator
+./01_install.sh
 
 # Configures the running Vault with some dummy values and enables Kubernetes auth
 ./03_add_secret_values.sh
@@ -34,7 +31,7 @@ where to point the demo to for some things.
 ./04_deploy_example_application.sh
 
 # Cleanup step. Tearsdown the resources created during the prior steps
-./05_cleanup.sh
+./04_cleanup.sh
 ```
 
 ## Disclaimer
