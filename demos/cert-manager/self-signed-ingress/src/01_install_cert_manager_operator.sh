@@ -3,7 +3,7 @@
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 DEMO_SRC_DIR="cert-manager/self-signed-ingress/src"
 UTILS_DIR=$(sed "s|$DEMO_SRC_DIR|utils|g" <<< "$SCRIPT_DIR")
-source $UTILS_DIR/*
+source $UTILS_DIR/ocp.sh
 
 # Create new demo project
 oc new-project cert-manager-operator

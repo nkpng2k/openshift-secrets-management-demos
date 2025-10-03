@@ -19,3 +19,5 @@ oc delete csv -n openshift-cluster-csi-drivers $CSV_NAME
 
 # Uninstall Vault via Helm
 uninstall_vault_openshift
+oc project default
+oc delete project hashicorp-vault

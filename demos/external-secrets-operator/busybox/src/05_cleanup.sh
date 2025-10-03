@@ -25,3 +25,5 @@ oc delete project external-secrets-operator
 
 # Uninstall Vault via Helm
 uninstall_vault_openshift
+oc project default
+oc delete project hashicorp-vault
