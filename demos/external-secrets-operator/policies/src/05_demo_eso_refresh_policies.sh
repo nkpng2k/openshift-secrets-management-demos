@@ -32,6 +32,13 @@ echo "The secret env var in the pod is: $ENV_SECRET"
 if [[ $MOUNTED_SECRET == "$NEW_PASS" ]]; then
   echo "SUCCESS! Mounted secret is the same as the expected secret"
 else
+  echo "Retrying: waiting for pod update"
+  wait_spinner 30
+  MOUNTED_SECRET=$(oc exec -it -n eso-demo-ns eso-demo -- cat /mnt/demo-vol/password)
+  if [[ $MOUNTED_SECRET == "$NEW_PASS" ]]; then
+    echo "SUCCESS! Mounted secret is the same as the expected secret"
+    exit 0
+  fi
   echo "FAIL... incorrect secret"
   echo "should have been: $NEW_PASS"
 fi

@@ -26,4 +26,5 @@ await_pod_ready $POD_NAME external-secrets-operator
 oc apply -f $SCRIPT_DIR/config/eso.yaml
 
 # Verify
+wait_spinner 10
 await_all_resources_ready external-secrets pod
