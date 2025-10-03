@@ -4,7 +4,7 @@
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 DEMO_SRC_DIR="external-secrets-operator/busybox/src"
 UTILS_DIR=$(sed "s|$DEMO_SRC_DIR|utils|g" <<< "$SCRIPT_DIR")
-source $UTILS_DIR/*
+source $UTILS_DIR/ocp.sh
 
 oc new-project eso-demo-ns
 oc project eso-demo-ns
@@ -18,6 +18,8 @@ sed \
   $SCRIPT_DIR/config/eso_resources.yaml > $SCRIPT_DIR/config/tmp_eso_resources.yaml
 oc apply -f $SCRIPT_DIR/config/tmp_eso_resources.yaml
 
+await_all_resources_ready eso-demo-ns externalsecret
+echo "ExternalSecret is Synced:"
 echo $(oc get secret -n eso-demo-ns | grep vault)
 B64STRING=$(oc get secret vault-secret-example -n eso-demo-ns -o 'jsonpath={..data.password}')
 echo $(base64 -d <<< $B64STRING)
