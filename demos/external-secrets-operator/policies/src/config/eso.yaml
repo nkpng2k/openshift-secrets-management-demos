@@ -1,7 +1,0 @@
-apiVersion: operator.openshift.io/v1alpha1
-kind: ExternalSecrets
-metadata:
-  labels:
-    app.kubernetes.io/name: external-secrets-operator
-  name: cluster
-spec: {}
