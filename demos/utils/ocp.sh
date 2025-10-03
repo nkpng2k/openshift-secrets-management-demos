@@ -23,6 +23,13 @@ await_pod_ready() {
   echo "pod ready"
 }
 
+# Wrapper around oc wait for ease of use
+# $1: namespace
+# $2: resource type
+await_all_resources_ready() {
+  oc wait --all=true --for=condition=Ready -n $1 $2
+}
+
 # Utility function for inspecting CSV readiness
 # $1: namespace
 await_csv_ready() {

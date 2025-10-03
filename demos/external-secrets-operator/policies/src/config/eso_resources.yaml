@@ -1,0 +1,60 @@
+apiVersion: external-secrets.io/v1alpha1
+kind: SecretStore
+metadata:
+  name: vault-backend
+  namespace: eso-demo-ns
+spec:
+  provider:
+    vault:
+      server: "http://VAULT_SVC_CLUSTER_IP:8200"
+      path: "kv"
+      version: "v2"
+      auth:
+        # Authenticate against Vault using a Kubernetes ServiceAccount
+        # token stored in a Secret.
+        # https://www.vaultproject.io/docs/auth/kubernetes
+        kubernetes:
+          # Path where the Kubernetes authentication backend is mounted in Vault
+          mountPath: "kubernetes"
+          # A required field containing the Vault Role to assume.
+          role: "eso-role"
+          # Optional service account field containing the name
+          # of a kubernetes ServiceAccount
+          serviceAccountRef:
+            name: "eso-demo-sa"
+            namespace: "eso-demo-ns"
+---
+apiVersion: external-secrets.io/v1beta1
+kind: ExternalSecret
+metadata:
+  name: vault-external-secret
+  namespace: eso-demo-ns
+spec:
+  refreshPolicy: Periodic
+  refreshInterval: 1m   
+  secretStoreRef:
+    name: vault-backend
+    kind: SecretStore
+  target:
+    name: vault-secret-example
+    deletionPolicy: Delete
+    creationPolicy: Owner # This is the default
+  data:
+  - secretKey: password
+    remoteRef:
+      key: secret
+      property: password
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: eso-demo-crb
+  namespace: eso-demo-ns
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: system:auth-delegator
+subjects:
+  - kind: ServiceAccount
+    name: eso-demo-sa
+    namespace: eso-demo-ns
