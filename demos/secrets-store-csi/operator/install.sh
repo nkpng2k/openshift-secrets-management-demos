@@ -19,3 +19,10 @@ await_pod_ready $POD_NAME openshift-cluster-csi-drivers
 
 # Deploy
 oc apply -f $SCRIPT_DIR/config/sscsi.yaml
+
+# Wait for SSCSI Driver to complete install
+# NOTE: Throws exception if this step isn't completed
+while [[ $(oc get CSIDriver -n openshift-cluster-csi-drivers | grep "secrets-store") == "" ]]; do
+  echo "Waiting for SSCSI driver install"
+  sleep 10
+done
