@@ -1,0 +1,43 @@
+﻿apiVersion: console.openshift.io/v1
+kind: ConsoleQuickStart
+metadata:
+  name: external-secrets-operator-quickstart
+spec:
+  displayName: Install the external secrets operator for Red Hat OpenShift
+  tags:
+    - example
+    - install
+    - operator
+  durationMinutes: 5
+  description: |-
+    Install the external secrets operator for Red Hat OpenShift to manage credentials sourced from an external secrets manager (Conjur, Vault)
+  introduction: |-
+    # External Secrets Operator for Red Hat OpenShift
+
+    The external secrets operator enables you to bring secrets or other "confidential material" into an OpenShift cluster
+    from an external source such as CyberArk Conjur, HashiCorp Vault, or any of the cloud service provider secrets managers.
+
+    ### Usage
+
+    You can use a `SecretStore` or `ClusterSecretStore` to define how to connect to the secrets manager, and
+    use an `ExternalSecret` to define what credential to pull and where to place the credential in the
+    OpenShift cluster. 
+  tasks:
+    - title: Install the external secrets operator for Red Hat OpenShift
+      description: |-
+        ### To install the operator:
+        1. From the **Administrators** perspective, go to the **OperatorHub** from the [Operators]{{highlight qs-nav-operators}} section of the navigation.
+        2. In the **Filter by keyword** field, type `External Secrets Operator`.
+        3. Look for **External Secrets Operator for Red Hat OpenShift**. If the tile has an **Installed** label on it, the Operator is already installed. Proceed to the next task.
+        4. Click the tile to open the side panel.
+        5. At the top of the side panel, click **Install**.
+        6. Verify that the **Operator Update Channel** is set to the latest version, then click **Install**. You may need to "Approve" the installation.
+        7. Wait for the External Secrets Operator's status to change from **Installing operator** to **Operator installed - Ready for use**.
+      review:
+        instructions: |-
+          #### Verify the operator was successfully installed:
+        failedTaskHelp: This task isn’t verified yet. Try the task again.
+      summary:
+        success: You just installed the external secrets operator for Red Hat OpenShift! Check out the next Quick Start for a simple example of how to use the Custom Resources provided by the operator.
+        failed: Try the steps again.
+  conclusion: 'Your external secrets operator is ready!'
