@@ -23,35 +23,32 @@ Must have admin credentials for an OpenShift cluster and be logged in via:
 where to point the demo to for some things.
 4. Run the scripts in order from the `src` folder:
 ```sh
-# Installs the external secrets manager. Vault is currently the only supported
-./01_install_external_secrets_repo.sh
-
-# Installs External Secrets Operator and necessary configurations
-./02_install_external_secrets_operator.sh
+# Installs the external secrets manager (Vault) and External Secret Operator
+./01_install.sh 
 
 # Configures the running Vault with some dummy values and enables Kubernetes auth
-./03_add_secret_values.sh
+./02_add_secret_values.sh
 
 # Deploys a sample application and performs a simple validation
-./04_deploy_example_application.sh
+./03_deploy_example_application.sh
 
 # Updates the secret in Vault and waits for update to be pulled by ESO
-./05_demo_eso_refresh_policies.sh
+./04_demo_eso_refresh_policies.sh
 
 # Deletes the secret in Vault and waits for update to be pulled by ESO
-./06_demo_eso_deletion_policies.sh
+./05_demo_eso_deletion_policies.sh
 
 # Cleanup step. Tearsdown the resources created during the prior steps
-./07_cleanup.sh
+./06_cleanup.sh
 ```
 
 ## Expected Output
-1. At step 4, you should see success statements echoed to the terminal
-2. At step 5, you should see success statements. Additionally, the
+1. At step 3, you should see success statements echoed to the terminal
+2. At step 4, you should see success statements. Additionally, the
 secret mounted as an Environment Variable will not have changed, but
 the secret mounted to the pod as a volume will reflect the change to
 Vault.
-3. At step 6, you should see output logs for events attached to the
+3. At step 5, you should see output logs for events attached to the
 `ExternalSecret` CR. Additionally, you should see a success message
 echoed to the terminal asserting the secret managed by the
 `ExternalSecret` has been deleted.

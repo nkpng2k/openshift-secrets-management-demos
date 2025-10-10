@@ -1,5 +1,9 @@
 #!/bin/bash
 
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+DEMO_SRC_DIR="self-signed-route/src"
+OPERATOR_DIR=$(sed "s|$DEMO_SRC_DIR|operator|g" <<< "$SCRIPT_DIR")
+
 # Clean up RBAC permissions
 oc delete rolebinding secret-reader-binding
 oc delete role secret-reader
@@ -8,12 +12,5 @@ oc delete role secret-reader
 oc delete project cert-manager-demo-ns
 oc project default
 
-# Clean up operator group and subscription
-oc delete sub openshift-cert-manager-operator -n cert-manager-operator
-oc delete og openshift-cert-manager-operator -n cert-manager-operator
-CSV_NAME=$(oc get csv -n cert-manager-operator --no-headers | awk '{ print $1 }')
-oc delete csv -n cert-manager-operator $CSV_NAME
-
-# Clean up operator namespaces
-oc delete project cert-manager-operator
-oc delete project cert-manager
+# Clean up operator
+/bin/bash $OPERATOR_DIR/cleanup.sh
