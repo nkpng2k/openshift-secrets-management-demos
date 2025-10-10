@@ -1,0 +1,42 @@
+﻿apiVersion: console.openshift.io/v1
+kind: ConsoleQuickStart
+metadata:
+  name: cert-manager-install
+spec:
+  displayName: Install the cert-manager operator for Red Hat OpenShift
+  tags:
+    - example
+    - install
+    - operator
+  durationMinutes: 5
+  description: |-
+    Install the cert-manager operator for Red Hat OpenShift to manage TLS certificates managed by an external PKI
+  introduction: |-
+    # cert-manager for Red Hat OpenShift
+
+    The cert-manager operator enables you to create and sign TLS certificates from an external PKI for your workloads
+    running on an OpenShift cluster.
+
+    ### Usage
+
+    You can use an `Issuer` to define what will be "issuing" the certificates and a `Certificate` to define what
+    the contents of said certificate should contain.
+  tasks:
+    - title: Install the cert-manager operator for Red Hat OpenShift
+      description: |-
+        ### To install the operator:
+        1. From the **Administrators** perspective, go to the **OperatorHub** from the [Operators]{{highlight qs-nav-operators}} section of the navigation.
+        2. In the **Filter by keyword** field, type `cert-manager operator`.
+        3. Look for **cert-manager Operator for Red Hat OpenShift**. If the tile has an **Installed** label on it, the Operator is already installed. Proceed to the next task.
+        4. Click the tile to open the side panel.
+        5. At the top of the side panel, click **Install**.
+        6. Verify that the **Operator Update Channel** is set to the latest version, then click **Install**. You may need to "Approve" the installation.
+        7. Wait for the cert-manager Operator's status to change from **Installing operator** to **Operator installed - Ready for use**.
+      review:
+        instructions: |-
+          #### Verify the operator was successfully installed:
+        failedTaskHelp: This task isn’t verified yet. Try the task again.
+      summary:
+        success: You just installed the cert-manager operator for Red Hat OpenShift! Check out the next Quick Start for a simple example of how to use the Custom Resources provided by the operator.
+        failed: Try the steps again.
+  conclusion: 'Your cert-manager operator is ready!'

@@ -1,7 +1,7 @@
 ﻿apiVersion: console.openshift.io/v1
 kind: ConsoleQuickStart
 metadata:
-  name: external-secrets-operator-quickstart
+  name: external-secrets-operator-install
 spec:
   displayName: Install the external secrets operator for Red Hat OpenShift
   tags:
@@ -28,7 +28,7 @@ spec:
         ### To install the operator:
         1. From the **Administrators** perspective, go to the **OperatorHub** from the [Operators]{{highlight qs-nav-operators}} section of the navigation.
         2. In the **Filter by keyword** field, type `External Secrets Operator`.
-        3. Look for **External Secrets Operator for Red Hat OpenShift**. If the tile has an **Installed** label on it, the Operator is already installed. Proceed to the next task.
+        3. Look for **External Secrets Operator for Red Hat OpenShift**. If the tile has an **Installed** label on it, the Operator is already installed, and you can close this Quick Start.
         4. Click the tile to open the side panel.
         5. At the top of the side panel, click **Install**.
         6. Verify that the **Operator Update Channel** is set to the latest version, then click **Install**. You may need to "Approve" the installation.
