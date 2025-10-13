@@ -1,0 +1,80 @@
+apiVersion: console.openshift.io/v1
+kind: ConsoleQuickStart
+metadata:
+  name: external-secrets-operator-example
+spec:
+  displayName: External Secrets Operator Example
+  tags:
+    - example
+    - operator
+  durationMinutes: 10
+  prerequisites:
+    - You completed the "Install the external secrets operator for Red Hat OpenShift" quick start.
+    - You have access to a running secret management system (ex. CyberArk Conjur, HashiCorp Vault, etc.)
+    - You have a set of test secrets that you can use for the example.
+  description: |-
+    Deploy simple examples of the external secrets operator CRDs
+  introduction: |-
+    # External Secrets Operator for Red Hat OpenShift
+
+    The external secrets operator enables you to bring secrets or other "confidential material" into an OpenShift cluster
+    from an external source such as CyberArk Conjur, HashiCorp Vault, or any of the cloud service provider secrets managers.
+
+    ### Expected Learning
+    
+    With this Quick Start, you will learn about the following CRDs provided by the external secrets operator:
+    1. SecretStore (and ClusterSecretStore for cluster scoped secret management)
+    2. ExternalSecret (and ClusterExternalSecret for cluster scoped secrets)
+
+    This Quick Start will walk you through the process of creating a SecretStore and pointing it to a
+    running secrets management system and creating an ExternalSecret to request a secret or credential
+    from the SecretStore.
+  tasks:
+    - title: Navigate to installed external secrets operator
+      description: |-
+        ### To navigate to the installed operator:
+        1. From the **Administrators** perspective, go to the **Installed Operators** from the [Operators]{{highlight qs-nav-operators}} section of the navigation.
+        2. In the **Search by name** field, type `External Secrets Operator`.
+        3. Look for **External Secrets Operator for Red Hat OpenShift**. If you had completed the prerequisite Quick Start, the tile should appear.
+        4. Click on the installed operator
+        
+        You will be brought to the **Operator Details** page and be presented with **Provided APIs**
+      review:
+        instructions: |-
+          #### Verify you see a list of **Provided APIs**:
+          The list should include `SecretStore` and `ExternalSecret`
+        failedTaskHelp: This task isn’t verified yet. Try the task again.
+      summary:
+        success: You are in the right place, and ready to start the rest of the Quick Start
+        failed: Try the steps again.
+    - title: Create a SecretStore
+      description: |-
+        ### To create a SecretStore on the OpenShift Cluster
+        1. Find the `SecretStore` Custom Resource in the list of **Provided APIs** or in the top side-scrolling menu bar
+          - From the list of **Provided APIs** click the **Create instance** link
+          - From the **top side-scrolling menu bar** click **SecretStore** and then click **Create SecretStore**
+        2. Fill in the required fields for a `SecretStore`
+          - NOTE: this includes knowing several pieces of information to properly fill in the `spec.provider` fields.
+        3. When you have filled out the necessary fields, click the **Create** button to proceed.
+      review:
+        instructions: |-
+          #### Verify the SecretStore was successfully deployed:
+        failedTaskHelp: This task isn’t verified yet. Try the task again.
+      summary:
+        success: You just deployed your first SecretStore. Take note of the name and namespace the SecretStore was deployed with.
+        failed: Try the steps again.
+    - title: Create an ExternalSecret
+      description: |-
+        ### To create a ExternalSecret on the OpenShift Cluster
+        1. Find the `ExternalSecret` Custom Resource in the list of **Provided APIs** or in the top side-scrolling menu bar
+          - From the list of **Provided APIs** click the **Create instance** link
+          - From the **top side-scrolling menu bar** click **ExternalSecret** and then click **Create ExternalSecret**
+        2. Fill in the required fields for a `ExternalSecret`
+        3. When you have filled out the necessary fields, click the **Create** button to proceed.
+      review:
+        instructions: |-
+          #### Verify the ExternalSecret was successfully deployed:
+        failedTaskHelp: This task isn’t verified yet. Try the task again.
+      summary:
+        success: You just deployed your first ExternalSecret
+        failed: Try the steps again.
