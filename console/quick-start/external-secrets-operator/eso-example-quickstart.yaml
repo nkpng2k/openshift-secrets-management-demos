@@ -11,6 +11,7 @@ spec:
   prerequisites:
     - You completed the "Install the external secrets operator for Red Hat OpenShift" quick start.
     - You have access to a running secret management system (ex. CyberArk Conjur, HashiCorp Vault, etc.)
+    - You know the authentication method configured for your selected secret management system
     - You have a set of test secrets that you can use for the example.
   description: |-
     Deploy simple examples of the external secrets operator CRDs
@@ -53,9 +54,12 @@ spec:
         1. Find the `SecretStore` Custom Resource in the list of **Provided APIs** or in the top side-scrolling menu bar
           - From the list of **Provided APIs** click the **Create instance** link
           - From the **top side-scrolling menu bar** click **SecretStore** and then click **Create SecretStore**
-        2. Fill in the required fields for a `SecretStore`
+        2. Fill in the required fields for a `SecretStore` via the form **OR** click the **YAML View** to edit the manifest directly.
           - NOTE: this includes knowing several pieces of information to properly fill in the `spec.provider` fields.
-        3. When you have filled out the necessary fields, click the **Create** button to proceed.
+          this will also include, knowing the authentication method for the `provider` and posessing any necessary credentials,
+          certificates, tokens, etc. necessary to authenticate against the secret management system chosen.
+          - In **YAML View** you can check the provided **Samples** on the right hand sidebar for some sample configurations.
+        3. When you have filled out the necessary fields or yaml, click the **Create** button to proceed.
       review:
         instructions: |-
           #### Verify the SecretStore was successfully deployed:
@@ -69,12 +73,68 @@ spec:
         1. Find the `ExternalSecret` Custom Resource in the list of **Provided APIs** or in the top side-scrolling menu bar
           - From the list of **Provided APIs** click the **Create instance** link
           - From the **top side-scrolling menu bar** click **ExternalSecret** and then click **Create ExternalSecret**
-        2. Fill in the required fields for a `ExternalSecret`
-        3. When you have filled out the necessary fields, click the **Create** button to proceed.
+        2. Fill in the required fields for an `ExternalSecret` via the form **OR** click the **YAML View** to edit the manifest directly.
+          - In **YAML View** you can check the provided **Samples** on the right hand sidebar for some sample configurations.
+        3. When you have filled out the necessary fields or yaml, click the **Create** button to proceed.
       review:
         instructions: |-
           #### Verify the ExternalSecret was successfully deployed:
+          1. You should see a green checkmark for your newly created ExternalSecret. `Condition: Ready`
+          2. Navigate to the [Workloads]{{highlight qs-nav-workloads}} section and click **Secrets**
+          3. You should see a new Secret created with the name you provided to the ExternalSecret `target.name` field
         failedTaskHelp: This task isn’t verified yet. Try the task again.
       summary:
         success: You just deployed your first ExternalSecret
+        failed: Try the steps again.
+    - title: Deploy a sample application
+      description: |-
+        ### To deploy a sample application that consumes the managed Secret
+        1. Proceed to the [Workloads]{{highlight qs-nav-workloads}} section and click **Pods**
+        2. Click the **Create Pod** button
+        3. Fill in the yaml with the following `spec`:
+
+        ```
+        spec:
+          serviceAccountName: SERVICE_ACCOUNT_NAME
+          securityContext:
+            fsGroup: 2000
+            runAsNonRoot: true
+            runAsUser: 1000
+          containers:
+          - image: busybox:stable
+            name: eso-demo
+            command: ["sh", "-c", "while true; do sleep 3600; done"]
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop:
+                  - ALL
+              runAsNonRoot: true
+            env:
+            - name: DEMO_PWD
+              valueFrom:
+                secretKeyRef:
+                  name: NAME_OF_TARGET_SECRET
+                  key: DATA_KEY_IN_TARGET_SECRET
+            volumeMounts:
+            - name: eso-demo-volume
+              mountPath: "/mnt/demo-vol"
+              readOnly: true
+          volumes:
+            - name: eso-demo-volume
+              secret:
+                secretName: NAME_OF_TARGET_SECRET
+        ```
+        4. Click the **Create* Button at the bottom of the screen
+      review:
+        instructions: |-
+          #### Verify the Pod was successfully deployed:
+          1. You should the pod deploy successfully
+          2. Once the pod is successfully Running, click on the running pod
+          3. Proceed to the **terminal** section
+          4. Run the command `ls mnt/demo-vol/`. You should see a file with your secret.
+          5. Run the command `echo $DEMO_PWD`. You should see your password output.
+        failedTaskHelp: This task isn’t verified yet. Try the task again.
+      summary:
+        success: You just deployed your first application using externally managed secrets
         failed: Try the steps again.
