@@ -3,7 +3,7 @@ kind: ConsoleQuickStart
 metadata:
   name: secrets-store-csi-install
 spec:
-  displayName: Install the Secrest Store CSI Driver Operator
+  displayName: Install the Secrets Store CSI Driver Operator
   tags:
     - example
     - install
@@ -42,6 +42,31 @@ spec:
           - Verify that there is a running Pod: **secrets-store-csi-driver-operator**
         failedTaskHelp: This task isn’t verified yet. Try the task again.
       summary:
-        success: You just installed the Secrets Store CSI Driver Operator! Check out the next Quick Start for a simple example of how to use the Custom Resources provided by the operator.
+        success: You just installed the Secrets Store CSI Driver Operator!
+        failed: Try the steps again.
+    - title: Deploy the ClusterCSIDriver
+      description: |-
+        ### To deploy the ClusterCSIDriver
+        1. Go to the [Administration]{{highlight qs-nav-administration}} section and click on **CustomResourceDefinitions**
+        2. In the **Search by name** field, type `ClusterCSIDriver` and click on the Custom Resource
+        3. Next to the **Details** tab, select the **Instances** tab.
+        4. Click **Create ClusterCSIDriver**
+        5. Copy the following manifest into the YAML editor field:
+
+        ```
+        apiVersion: operator.openshift.io/v1
+        kind: ClusterCSIDriver
+        metadata:
+            name: secrets-store.csi.k8s.io
+        spec:
+          managementState: Managed
+        ```
+        6. Click the **Create** button
+      review:
+        instructions: |-
+          #### Verify the ClusterCSIDriver is successfully deployed
+        failedTaskHelp: Try the task again.
+      summary:
+        success: You've successfully installed all the necessary components for the Secrets Store CSI Driver Operator. Check out the next Quick Start for a simple example of how to use the Custom Resources provided by the operator.
         failed: Try the steps again.
   conclusion: 'Your secrets store csi driver operator is ready!'
