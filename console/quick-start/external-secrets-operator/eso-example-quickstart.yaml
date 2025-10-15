@@ -13,6 +13,7 @@ spec:
     - You have access to a running secret management system (ex. CyberArk Conjur, HashiCorp Vault, etc.)
     - You know the authentication method configured for your selected secret management system
     - You have a set of test secrets that you can use for the example.
+    - You have a namespace in which to deploy the example CRs and workloads.
   description: |-
     Deploy simple examples of the external secrets operator CRDs
   introduction: |-
@@ -47,6 +48,18 @@ spec:
         failedTaskHelp: This task isn’t verified yet. Try the task again.
       summary:
         success: You are in the right place, and ready to start the rest of the Quick Start
+        failed: Try the steps again.
+    - title: Select a project
+      description: |-
+        ### Create or select a project to work in
+        1. Find the **Project** dropdown menu at the top of the screen.
+        2. Select or create the project in which you want to work in.
+      review:
+        instructions: |-
+          #### Verify the name in the **Project** dropdown menu is the expected project
+        failedTaskHelp: Try the task again.
+      summary:
+        success: You are in the right place.
         failed: Try the steps again.
     - title: Create a SecretStore
       description: |-
@@ -138,3 +151,4 @@ spec:
       summary:
         success: You just deployed your first application using externally managed secrets
         failed: Try the steps again.
+  conclusion: 'You have successfully deployed a sample application with secrets managed by the external secrets operator!'
