@@ -35,6 +35,11 @@ spec:
       review:
         instructions: |-
           #### Verify the operator was successfully installed:
+          - You should see a success message stating the operator was successfully installed.
+          - Navigate to the [Operators]{{highlight qs-nav-operators}} section and click on **Installed Operators**. You should see the Secrets Store CSI operator installed.
+          - Navigate to [Workloads]{{highlight qs-nav-workloads}} section and click **Pods**.
+          - Select in the top **Project** dropdown menu, the project **openshift-cluster-csi-drivers**
+          - Verify that there is a running Pod: **secrets-store-csi-driver-operator**
         failedTaskHelp: This task isn’t verified yet. Try the task again.
       summary:
         success: You just installed the Secrets Store CSI Driver Operator! Check out the next Quick Start for a simple example of how to use the Custom Resources provided by the operator.
