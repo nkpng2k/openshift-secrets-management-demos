@@ -38,6 +38,37 @@ spec:
           #### Verify the operator was successfully installed:
         failedTaskHelp: This task isn’t verified yet. Try the task again.
       summary:
-        success: You just installed the external secrets operator for Red Hat OpenShift! Check out the next Quick Start for a simple example of how to use the Custom Resources provided by the operator.
+        success: You just installed the external secrets operator for Red Hat OpenShift!
+        failed: Try the steps again.
+    - title: Deploy the ExternalSecrets Operand
+      description: |-
+        ### The ExternalSecrets Operand
+        Installing the external secrets operator provides you with the necessary APIs to deploy the ExternalSecrets operand.
+
+        When an ExternalSecrets CR is deployed, a new Deployment is created that manages the external-secrets singleton and
+        keeps it in the desired state.
+
+        ### To deploy the ExternalSecrets Custom Resource:
+        1. From the **Administrators** perspective, go to the **Installed Operators** from the [Operators]{{highlight qs-nav-operators}} section of the navigation.
+        2. In the **Search by name** field, type `External Secrets Operator`.
+        3. Click on the **external secrets operator for Red Hat OpenShift**
+        4. Find the `ExternalSecrets` Custom Resource in the **Provided APIs** list or in the top side-scrolling menu bar.
+          - NOTE: MAKE SURE YOU ARE SELECTING **ExternalSecrets** AND **NOT** **ExternalSecret**
+          - From the list of **Provided APIs** click the **Create instance** link
+          - From the **top side-scrolling menu bar** click **SecretStore** and then click **Create SecretStore**
+        5. For this QuickStart, you can use the default configurations for the `ExternalSecrets` Deployment.
+        6. Enter a name for the deployment, and then click **Create**
+      review:
+        instructions: |-
+          #### Verify the operand was successfully installed:
+          - Navigate to the [Workloads]{{highlight qs-nav-workloads}} section of the navigation, and click **Pods**
+          - Change the **Project** at the top of the screen to `external-secrets`
+          - Verify that there are 3 running pods.
+            - external-secrets
+            - external-secrets-cert-controller
+            - external-secrets-webhook
+        failedTaskHelp: This task isn’t verified yet. Try the task again.
+      summary:
+        success: You have completely deployed the external secrets operator for Red Hat OpenShift! Check out the next Quick Start for a simple example of how to use the Custom Resources provided by the operator.
         failed: Try the steps again.
   conclusion: 'Your external secrets operator is ready!'
