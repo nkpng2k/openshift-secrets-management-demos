@@ -151,7 +151,4 @@ spec:
       summary:
         success: You just deployed your first application using externally managed secrets
         failed: Try the steps again.
-<<<<<<< HEAD
   conclusion: 'You have successfully deployed a sample application with secrets managed by the external secrets operator!'
-=======
->>>>>>> a1659bb (complete eso demo)
