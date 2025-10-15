@@ -1,12 +1,11 @@
 apiVersion: console.openshift.io/v1
 kind: ConsoleQuickStart
 metadata:
-  name: secrets-store-csi-install
+  name: secrets-store-csi-example
 spec:
   displayName: Secrets Store CSI Driver Operator Example
   tags:
     - example
-    - install
     - operator
   durationMinutes: 10
   prerequisites:
