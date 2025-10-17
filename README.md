@@ -1,8 +1,8 @@
 # OpenShift Secrets Management Demos
 
-This repository is dedicated to demos associated with using secrets
-management tools in OpenShift. The goal is to provide clear guides
-on how to:
+This repository is dedicated to demos and quick-starts associated
+with using secrets management tools in OpenShift. The goal is to
+provide clear guides on how to:
 1. Deploy the secrets management tool.
 2. Configure the tool such that an application can obtain secrets
 from it.
@@ -23,6 +23,25 @@ of prerequisites is not comprehensive:
 * A running OpenShift cluster
 * An admin and user level set of credentials for the OpenShift cluster
 * A running instance of your preferred secrets management repository
+
+### Demos
+
+If you want to run demos for secrets management on OpenShift, you can
+look into the [demos](./demos/) directory. This contains the necessary
+scripts to run a demo.
+
+The scripts are somewhat modular:
+- Use the `demos/<operator name>/operator` directory to see the generic
+install steps.
+- Use the `demos/<operator name>/<feature name>` directory to see the
+appropriately named demo steps. Most of these demos use the install
+scripts from their respective `operator` directories.
+
+### QuickStarts
+
+The [console/quickstart](./console/quick-start/) directory contains
+OpenShift Console QuickStarts which can be installed on an OpenShift
+cluster.
 
 # Contribution
 
