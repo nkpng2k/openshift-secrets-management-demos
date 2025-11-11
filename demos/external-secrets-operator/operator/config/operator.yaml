@@ -12,8 +12,9 @@ metadata:
   name: openshift-external-secrets-operator
   namespace: external-secrets-operator
 spec:
-  channel: tech-preview-v0.1
+  channel: stable-v1
   name: openshift-external-secrets-operator
   source: redhat-operators
   sourceNamespace: openshift-marketplace
   installPlanApproval: Automatic
+  startingCSV: external-secrets-operator.v1.0.0

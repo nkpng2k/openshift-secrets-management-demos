@@ -55,9 +55,21 @@ spec:
         4. Find the `ExternalSecretsConfigs` Custom Resource in the **Provided APIs** list or in the top side-scrolling menu bar.
           - From the list of **Provided APIs** click the **Create instance** link
           - From the **top side-scrolling menu bar** click **ExternalSecretsConfigs** and then click **Create ExternalSecretsConfig**
-        5. For this QuickStart, you can use the default configurations for the `ExternalSecretsConfig` Deployment.
-          - NOTE: This CR enables you to add additional configurations including ingress and egress network policies.
-        6. Click **Create**
+        5. For this QuickStart, you can use the default configurations for the `ExternalSecretsConfig` Deployment, including an `allow-all` egress policy.
+          - NOTE: an `allow-all` egress policy is not recommended in production environments.
+        6. Copy the below manifest into the console editor for the **ExternalSecretsConfig** deployment.
+
+        ```
+        spec:
+          controllerConfig:
+            networkPolicies:
+              - name: allow-external-secrets-egress
+                componentName: ExternalSecretsCoreController
+                egress:
+                - {}
+        ```
+
+        7. Click **Create**
       review:
         instructions: |-
           #### Verify the operand was successfully installed:
