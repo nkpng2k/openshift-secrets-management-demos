@@ -4,7 +4,7 @@ metadata:
   name: eso-vault-secret-store-provider-sample
 spec:
   targetResource:
-    apiVersion: external-secrets.io/v1beta1
+    apiVersion: external-secrets.io/v1
     kind: SecretStore
   title: Example SecretStore - HashiCorp Vault Kubernetes Authentication
   description: |
@@ -12,7 +12,7 @@ spec:
     Documentation can be found in the HashiCorp Documentation
     here: https://developer.hashicorp.com/vault/docs/auth/kubernetes
   yaml: |
-    apiVersion: external-secrets.io/v1beta1
+    apiVersion: external-secrets.io/v1
     kind: SecretStore
     metadata:
       name: SECRET_STORE_NAME

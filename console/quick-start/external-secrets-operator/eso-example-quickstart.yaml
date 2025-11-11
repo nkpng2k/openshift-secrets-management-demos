@@ -35,7 +35,7 @@ spec:
     - title: Navigate to installed external secrets operator
       description: |-
         ### To navigate to the installed operator:
-        1. From the **Administrators** perspective, go to the **Installed Operators** from the [Operators]{{highlight qs-nav-operators}} section of the navigation.
+        1. From the **Administrators** perspective, go to the **Installed Operators** from the [Ecosystem]{{highlight qs-nav-ecosystem}} section of the navigation.
         2. In the **Search by name** field, type `External Secrets Operator`.
         3. Look for **External Secrets Operator for Red Hat OpenShift**. If you had completed the prerequisite Quick Start, the tile should appear.
         4. Click on the installed operator

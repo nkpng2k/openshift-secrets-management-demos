@@ -26,7 +26,7 @@ spec:
     - title: Install the external secrets operator for Red Hat OpenShift
       description: |-
         ### To install the operator:
-        1. From the **Administrators** perspective, go to the **OperatorHub** from the [Operators]{{highlight qs-nav-operators}} section of the navigation.
+        1. From the **Administrators** perspective, go to the **Software Catalog** from the [Ecosystem]{{highlight qs-nav-ecosystem}} section of the navigation.
         2. In the **Filter by keyword** field, type `External Secrets Operator`.
         3. Look for **External Secrets Operator for Red Hat OpenShift**. If the tile has an **Installed** label on it, the Operator is already installed, and you can close this Quick Start.
         4. Click the tile to open the side panel.
@@ -45,19 +45,31 @@ spec:
         ### The ExternalSecrets Operand
         Installing the external secrets operator provides you with the necessary APIs to deploy the ExternalSecrets operand.
 
-        When an ExternalSecrets CR is deployed, a new Deployment is created that manages the external-secrets singleton and
+        When an ExternalSecretsConfig CR is deployed, a new Deployment is created that manages the external-secrets singleton and
         keeps it in the desired state.
 
-        ### To deploy the ExternalSecrets Custom Resource:
-        1. From the **Administrators** perspective, go to the **Installed Operators** from the [Operators]{{highlight qs-nav-operators}} section of the navigation.
+        ### To deploy the ExternalSecretsConfig Custom Resource:
+        1. From the **Administrators** perspective, go to the **Installed Operators** from the [Ecosystem]{{highlight qs-nav-ecosystem}} section of the navigation.
         2. In the **Search by name** field, type `External Secrets Operator`.
         3. Click on the **external secrets operator for Red Hat OpenShift**
-        4. Find the `ExternalSecrets` Custom Resource in the **Provided APIs** list or in the top side-scrolling menu bar.
-          - NOTE: MAKE SURE YOU ARE SELECTING **ExternalSecrets** AND **NOT** **ExternalSecret**
+        4. Find the `ExternalSecretsConfigs` Custom Resource in the **Provided APIs** list or in the top side-scrolling menu bar.
           - From the list of **Provided APIs** click the **Create instance** link
-          - From the **top side-scrolling menu bar** click **SecretStore** and then click **Create SecretStore**
-        5. For this QuickStart, you can use the default configurations for the `ExternalSecrets` Deployment.
-        6. Enter a name for the deployment, and then click **Create**
+          - From the **top side-scrolling menu bar** click **ExternalSecretsConfigs** and then click **Create ExternalSecretsConfig**
+        5. For this QuickStart, you can use the default configurations for the `ExternalSecretsConfig` Deployment, including an `allow-all` egress policy.
+          - NOTE: an `allow-all` egress policy is not recommended in production environments.
+        6. Copy the below manifest into the console editor for the **ExternalSecretsConfig** deployment.
+
+        ```
+        spec:
+          controllerConfig:
+            networkPolicies:
+              - name: allow-external-secrets-egress
+                componentName: ExternalSecretsCoreController
+                egress:
+                - {}
+        ```
+
+        7. Click **Create**
       review:
         instructions: |-
           #### Verify the operand was successfully installed:
