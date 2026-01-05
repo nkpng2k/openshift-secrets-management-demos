@@ -44,7 +44,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
-    cert-manager.io/issuer: test-ca-issuer
+    cert-manager.io/issuer: test-ca-issuer-TYPE
   name: hello-openshift-ingress
 spec:
   rules:
@@ -61,4 +61,4 @@ spec:
   tls:
     - hosts:
         - DNS_HOST
-      secretName: test-server-tls
+      secretName: test-server-tls-TYPE

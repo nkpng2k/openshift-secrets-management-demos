@@ -51,4 +51,4 @@ spec:
     name: hello-openshift-route
   tls:
     externalCertificate:
-      name: test-server-tls
+      name: test-server-tls-TYPE
