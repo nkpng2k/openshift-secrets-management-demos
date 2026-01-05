@@ -13,6 +13,8 @@ metadata:
   namespace: cert-manager-demo-ns
 spec:
   isCA: true
+  duration: 60m
+  renewBefore: 10m
   commonName: test-ca-TYPE
   subject:
     organizations:
@@ -48,6 +50,8 @@ spec:
   usages:
     - server auth
     - client auth
+  duration: 60m
+  renewBefore: 10m
   dnsNames:
   - DNS_HOST
   issuerRef:
@@ -64,6 +68,8 @@ spec:
   usages:
     - server auth
     - client auth
+  duration: 60m
+  renewBefore: 10m
   dnsNames:
   - DNS_HOST
   issuerRef:

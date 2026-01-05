@@ -12,6 +12,8 @@ metadata:
   name: test-ca-TYPE
   namespace: cert-manager-demo-ns
 spec:
+  duration: 60m
+  renewBefore: 10m
   isCA: true
   commonName: test-ca-TYPE
   subject:
@@ -40,25 +42,11 @@ spec:
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: test-server-TYPE
-  namespace: cert-manager-demo-ns
-spec:
-  secretName: test-server-tls-TYPE
-  isCA: false
-  usages:
-    - server auth
-    - client auth
-  dnsNames:
-  - DNS_HOST
-  issuerRef:
-    name: test-ca-issuer-TYPE
----
-apiVersion: cert-manager.io/v1
-kind: Certificate
-metadata:
   name: test-client-TYPE
   namespace: cert-manager-demo-ns
 spec:
+  duration: 60m
+  renewBefore: 10m
   secretName: test-client-tls-TYPE
   isCA: false
   usages:
