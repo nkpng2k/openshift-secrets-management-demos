@@ -1,0 +1,50 @@
+# apiVersion: monitoring.openshift.io/v1
+# kind: AlertingRule
+# metadata:
+#   name: cm-num-csr
+#   namespace: openshift-monitoring
+# spec:
+#   groups:
+#   - name: cm-num-csr
+#     rules:
+#     - alert: ClusterNumberCertificateSigningRequest
+#       expr: delta(cluster:usage:resources:sum{resource="certificates.cert-manager.io"}[30m]) > 4
+#       for: 5m
+#       labels:
+#         severity: warning
+# ---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: failed-renewal-cert-alert
+  namespace: cert-manager 
+spec:
+  groups:
+  - name: failed-renewal-cert-alertin
+    rules:
+    - alert: CertFailedRenewal
+      expr: certmanager_certificate_renewal_timestamp_seconds - time() < 0
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Certificate {{ $labels.name }} failed renewal"
+        description: "{{ $labels.name }} in {{ $labels.namespace }} failed to renew for 5 minutes"
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: certificate-not-ready
+  namespace: cert-manager 
+spec:
+  groups:
+  - name: not-ready-cert-alert
+    rules:
+    - alert: CertFailedRenewal
+      expr: certmanager_certificate_renewal_timestamp_seconds - time() < 0
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Certificate {{ $labels.name }} failed renewal"
+        description: "{{ $labels.name }} in {{ $labels.namespace }} failed to renew for 5 minutes"

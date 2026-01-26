@@ -1,0 +1,58 @@
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: selfsigned-issuer-monitor
+  namespace: cert-manager-monitor-ns
+spec:
+  selfSigned: {}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: test-ca-monitor
+  namespace: cert-manager-monitor-ns
+spec:
+  duration: 60m
+  renewBefore: 50m
+  isCA: true
+  commonName: test-ca-monitor
+  subject:
+    organizations:
+      - ACME Inc.
+    organizationalUnits:
+      - Widgets
+  secretName: test-ca-secret-monitor
+  privateKey:
+    algorithm: ECDSA
+    size: 256
+  issuerRef:
+    name: selfsigned-issuer-monitor
+    kind: Issuer
+    group: cert-manager.io
+---
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: test-ca-issuer-monitor
+  namespace: cert-manager-monitor-ns
+spec:
+  ca:
+    secretName: test-ca-secret-monitor
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: test-client-monitor
+  namespace: cert-manager-monitor-ns
+spec:
+  duration: 60m
+  renewBefore: 50m
+  secretName: test-client-tls-monitor
+  isCA: false
+  usages:
+    - server auth
+    - client auth
+  dnsNames:
+  - DNS_HOST
+  issuerRef:
+    name: test-ca-issuer-monitor
