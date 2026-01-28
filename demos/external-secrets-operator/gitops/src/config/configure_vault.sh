@@ -15,10 +15,10 @@ EOF
 
 vault write auth/kubernetes/role/eso-role \
   bound_service_account_names=eso-demo-sa \
-  bound_service_account_namespaces=eso-demo-ns \
+  bound_service_account_namespaces=openshift-gitops \
   policies=eso \
   ttl=20m
 
 vault secrets enable -version=2 kv
-vault kv put kv/argodemo private-key=/tmp/key.pem
+vault kv put kv/argodemo private-key=@/tmp/key.pem
 vault kv put kv/secret password=demo-secret-password-123

@@ -1,0 +1,18 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: eso-demo
+  namespace: openshift-gitops
+spec:
+  destination:
+    namespace: eso-argo-demo-ns
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    path: GH_PATH
+    repoURL: GH_REPO
+    targetRevision: GH_BRANCH
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

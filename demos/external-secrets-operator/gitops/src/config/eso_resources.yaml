@@ -2,7 +2,7 @@ apiVersion: external-secrets.io/v1
 kind: SecretStore
 metadata:
   name: vault-backend
-  namespace: eso-demo-ns
+  namespace: openshift-gitops
 spec:
   provider:
     vault:
@@ -22,13 +22,13 @@ spec:
           # of a kubernetes ServiceAccount
           serviceAccountRef:
             name: "eso-demo-sa"
-            namespace: "eso-demo-ns"
+            namespace: "openshift-gitops"
 ---
 apiVersion: external-secrets.io/v1
 kind: ExternalSecret
 metadata:
-  name: vault-external-secret
-  namespace: eso-demo-ns
+  name: vault-es-gh-pem
+  namespace: openshift-gitops
 spec:
   secretStoreRef:
     name: vault-backend
@@ -41,11 +41,51 @@ spec:
       key: argodemo
       property: private-key
 ---
+apiVersion: generators.external-secrets.io/v1alpha1
+kind: GithubAccessToken
+metadata:
+  name: github-auth-token
+  namespace: "openshift-gitops"
+spec:
+  appID: "GH_APP_ID"
+  installID: "GH_INSTALL_ID"
+  auth:
+    privateKey:
+      secretRef:
+        name: github-app-pem
+        key: private-key
+---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: github-auth-token-argocd-es
+  namespace: "openshift-gitops"
+spec:
+  refreshInterval: "30m0s" # Be sure to set this value lower than 60m since that is the expiration time from github
+  dataFrom:
+  - sourceRef:
+      generatorRef:
+        apiVersion: generators.external-secrets.io/v1alpha1
+        kind: GithubAccessToken
+        name: github-auth-token
+  target:
+    template:
+      metadata:
+        labels:
+          argocd.argoproj.io/secret-type: repository
+      data:
+        type: git
+        url: "GH_REPO"
+        username: "unused"
+        password: "{{ .token }}"
+        project: default
+    name: github-auth-token-argocd-secret
+---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   name: eso-demo-crb
-  namespace: eso-demo-ns
+  namespace: openshift-gitops
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -53,4 +93,4 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: eso-demo-sa
-    namespace: eso-demo-ns
+    namespace: openshift-gitops
