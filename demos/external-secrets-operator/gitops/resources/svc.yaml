@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: hello-openshift-ingress
+  namespace: eso-argo-demo-ns
+spec:
+  selector:
+    deployment: hello-openshift-ingress
+  ports:
+  - name: 8080-tcp
+    port: 8080
+    protocol: TCP
+    targetPort: 8080
+  - name: 8888-tcp
+    port: 8888
+    protocol: TCP
+    targetPort: 8888
