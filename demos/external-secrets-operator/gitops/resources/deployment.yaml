@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-openshift-ingress
+  namespace: eso-argo-demo-ns
+spec:
+  selector:
+    matchLabels:
+      deployment: hello-openshift-ingress
+  template:
+    metadata:
+      labels:
+        deployment: hello-openshift-ingress
+    spec:
+      containers:
+      - name: hello-openshift-ingress
+        image: openshift/hello-openshift:v3.9.0
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        - containerPort: 8888
+          protocol: TCP
+        resources: {}

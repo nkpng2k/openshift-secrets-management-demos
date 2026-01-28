@@ -1,0 +1,96 @@
+apiVersion: external-secrets.io/v1
+kind: SecretStore
+metadata:
+  name: vault-backend
+  namespace: openshift-gitops
+spec:
+  provider:
+    vault:
+      server: "http://VAULT_SVC_CLUSTER_IP:8200"
+      path: "kv"
+      version: "v2"
+      auth:
+        # Authenticate against Vault using a Kubernetes ServiceAccount
+        # token stored in a Secret.
+        # https://www.vaultproject.io/docs/auth/kubernetes
+        kubernetes:
+          # Path where the Kubernetes authentication backend is mounted in Vault
+          mountPath: "kubernetes"
+          # A required field containing the Vault Role to assume.
+          role: "eso-role"
+          # Optional service account field containing the name
+          # of a kubernetes ServiceAccount
+          serviceAccountRef:
+            name: "eso-demo-sa"
+            namespace: "openshift-gitops"
+---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: vault-es-gh-pem
+  namespace: openshift-gitops
+spec:
+  secretStoreRef:
+    name: vault-backend
+    kind: SecretStore
+  target:
+    name: github-app-pem
+  data:
+  - secretKey: private-key
+    remoteRef:
+      key: argodemo
+      property: private-key
+---
+apiVersion: generators.external-secrets.io/v1alpha1
+kind: GithubAccessToken
+metadata:
+  name: github-auth-token
+  namespace: "openshift-gitops"
+spec:
+  appID: "GH_APP_ID"
+  installID: "GH_INSTALL_ID"
+  auth:
+    privateKey:
+      secretRef:
+        name: github-app-pem
+        key: private-key
+---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: github-auth-token-argocd-es
+  namespace: "openshift-gitops"
+spec:
+  refreshInterval: "30m0s" # Be sure to set this value lower than 60m since that is the expiration time from github
+  dataFrom:
+  - sourceRef:
+      generatorRef:
+        apiVersion: generators.external-secrets.io/v1alpha1
+        kind: GithubAccessToken
+        name: github-auth-token
+  target:
+    template:
+      metadata:
+        labels:
+          argocd.argoproj.io/secret-type: repository
+      data:
+        type: git
+        url: "GH_REPO"
+        username: "unused"
+        password: "{{ .token }}"
+        project: default
+    name: github-auth-token-argocd-secret
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: eso-demo-crb
+  namespace: openshift-gitops
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: system:auth-delegator
+subjects:
+  - kind: ServiceAccount
+    name: eso-demo-sa
+    namespace: openshift-gitops

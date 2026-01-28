@@ -16,11 +16,8 @@ oc apply -f $SCRIPT_DIR/config/operator.yaml
 
 # Verify Operator
 wait_spinner 5
-oc get sub openshift-external-secrets-operator -n external-secrets-operator
-oc get installplan -n external-secrets-operator
-await_csv_ready external-secrets-operator
-POD_NAME=$(get_pod_name external external-secrets-operator)
-await_pod_ready $POD_NAME external-secrets-operator
+oc wait --all=true --for=jsonpath='{.status.phase}'=Succeeded csv
+await_all_resources_ready external-secrets-operator pod
 
 # Deploy
 oc apply -f $SCRIPT_DIR/config/eso.yaml
