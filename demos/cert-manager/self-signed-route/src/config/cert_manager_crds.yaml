@@ -1,7 +1,7 @@
 apiVersion: cert-manager.io/v1
 kind: Issuer
 metadata:
-  name: selfsigned-issuer
+  name: selfsigned-issuer-TYPE
   namespace: cert-manager-demo-ns
 spec:
   selfSigned: {}
@@ -9,62 +9,68 @@ spec:
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: test-ca
+  name: test-ca-TYPE
   namespace: cert-manager-demo-ns
 spec:
   isCA: true
-  commonName: test-ca
+  duration: 60m
+  renewBefore: 10m
+  commonName: test-ca-TYPE
   subject:
     organizations:
       - ACME Inc.
     organizationalUnits:
       - Widgets
-  secretName: test-ca-secret
+  secretName: test-ca-secret-TYPE
   privateKey:
     algorithm: ECDSA
     size: 256
   issuerRef:
-    name: selfsigned-issuer
+    name: selfsigned-issuer-TYPE
     kind: Issuer
     group: cert-manager.io
 ---
 apiVersion: cert-manager.io/v1
 kind: Issuer
 metadata:
-  name: test-ca-issuer
+  name: test-ca-issuer-TYPE
   namespace: cert-manager-demo-ns
 spec:
   ca:
-    secretName: test-ca-secret
+    secretName: test-ca-secret-TYPE
 ---
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: test-server
+  name: test-server-TYPE
   namespace: cert-manager-demo-ns
 spec:
-  secretName: test-server-tls
+  secretName: test-server-tls-TYPE
   isCA: false
   usages:
     - server auth
     - client auth
+  duration: 60m
+  renewBefore: 10m
   dnsNames:
   - DNS_HOST
   issuerRef:
-    name: test-ca-issuer
+    name: test-ca-issuer-TYPE
 ---
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: test-client
+  name: test-client-TYPE
   namespace: cert-manager-demo-ns
 spec:
-  secretName: test-client-tls
+  secretName: test-client-tls-TYPE
   isCA: false
   usages:
     - server auth
     - client auth
+  duration: 60m
+  renewBefore: 10m
   dnsNames:
   - DNS_HOST
   issuerRef:
-    name: test-ca-issuer
+    name: test-ca-issuer-TYPE

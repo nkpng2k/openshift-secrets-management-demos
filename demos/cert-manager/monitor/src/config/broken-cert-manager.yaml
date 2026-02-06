@@ -1,0 +1,8 @@
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: cm-broken-issuer
+  namespace: cert-manager-monitor-ns
+spec:
+  ca:
+    secretName: missing-key-pair

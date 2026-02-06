@@ -1,0 +1,28 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: certificate-renewal-stuck
+  namespace: cert-manager
+spec:
+  groups:
+  - name: cert-manager-failure-alerts
+    rules:
+    - alert: CertificateRenewalStuck
+      expr: |
+        certmanager_certificate_ready_status{condition="True"} == 0
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Certificate renewal failing for {{ $labels.name }}"
+        description: "The certificate {{ $labels.name }} in namespace {{ $labels.exported_namespace }} has failed to renew and is no longer in a 'Ready' state. Check CertificateRequest or Issuer configuration."
+        runbook_url: "https://cert-manager.io/docs/troubleshooting/"
+    - alert: CertificateExpiringSoon
+      expr: |
+        (certmanager_certificate_expiration_timestamp_seconds - time()) / 3600 < 0.8
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Certificate for {{ $labels.name }} expires in less than 5 minutes"
+        description: "The certificate {{ $labels.name }} in namespace {{ $labels.exported_namespace }} is approaching expiration and a renewal hasn't succeeded yet."

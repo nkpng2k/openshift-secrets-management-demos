@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: hello-openshift-ingress
-  namespace: cert-manager-demo-ns
+  namespace: cert-manager-monitor-ns
 spec:
   selector:
     matchLabels:
@@ -26,7 +26,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: hello-openshift-ingress
-  namespace: cert-manager-demo-ns
+  namespace: cert-manager-monitor-ns
 spec:
   selector:
     deployment: hello-openshift-ingress
@@ -44,7 +44,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
-    cert-manager.io/issuer: test-ca-issuer-TYPE
+    cert-manager.io/issuer: test-ca-issuer-monitor
     cert-manager.io/duration: 60m
     cert-manager.io/renewBefore: 10m
   name: hello-openshift-ingress
@@ -63,4 +63,4 @@ spec:
   tls:
     - hosts:
         - DNS_HOST
-      secretName: test-server-tls-TYPE
+      secretName: test-server-tls-monitor

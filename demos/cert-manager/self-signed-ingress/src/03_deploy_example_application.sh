@@ -10,9 +10,11 @@ source $UTILS_DIR/ocp.sh
 BASE_DOMAIN=$(oc get dns/cluster -o=jsonpath='{.spec.baseDomain}')
 APP_PREFIX=hello-openshift-ingress
 HOST=${APP_PREFIX}.apps.${BASE_DOMAIN}
+TYPE="ingress"
 
 sed \
   -e "s|DNS_HOST|$HOST|g" \
+  -e "s|TYPE|$TYPE|g" \
   $SCRIPT_DIR/config/cert_manager_example.yaml > $SCRIPT_DIR/config/tmp_cert_manager_example.yaml
 oc apply -f $SCRIPT_DIR/config/tmp_cert_manager_example.yaml
 
@@ -20,7 +22,7 @@ oc apply -f $SCRIPT_DIR/config/tmp_cert_manager_example.yaml
 wait_spinner 15
 
 # Run test with curl
-curl --cacert <(oc get secret -n cert-manager-demo-ns test-client-tls -o jsonpath='{.data.ca\.crt}' | base64 -d) \
+curl --cacert <(oc get secret -n cert-manager-demo-ns test-client-tls-$TYPE -o jsonpath='{.data.ca\.crt}' | base64 -d) \
   -v https://$HOST
 
 # Sample test without --cacert should fail

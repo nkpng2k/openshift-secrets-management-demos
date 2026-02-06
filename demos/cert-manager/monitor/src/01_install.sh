@@ -1,0 +1,11 @@
+#!/bin/bash
+
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+DEMO_SRC_DIR="monitor/src"
+OPERATOR_DIR=$(sed "s|$DEMO_SRC_DIR|operator|g" <<< "$SCRIPT_DIR")
+
+# Run generalized install scripts
+/bin/bash $OPERATOR_DIR/install.sh
+
+oc apply -f $SCRIPT_DIR/config/cluster-monitoring-config.yaml
+oc apply -f $SCRIPT_DIR/config/servicemonitor-cert-manager.yaml

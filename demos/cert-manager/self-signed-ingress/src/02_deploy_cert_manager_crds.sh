@@ -11,9 +11,11 @@ oc project cert-manager-demo-ns
 BASE_DOMAIN=$(oc get dns/cluster -o=jsonpath='{.spec.baseDomain}')
 APP_PREFIX=hello-openshift-ingress
 HOST=${APP_PREFIX}.apps.${BASE_DOMAIN}
+TYPE="ingress"
 
 sed \
   -e "s|DNS_HOST|$HOST|g" \
+  -e "s|TYPE|$TYPE|g" \
   $SCRIPT_DIR/config/cert_manager_crds.yaml > $SCRIPT_DIR/config/tmp_cert_manager_crds.yaml
 
 # Deploy cert-manager Issuer and Certificates
