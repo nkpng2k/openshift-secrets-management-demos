@@ -35,6 +35,5 @@ oc apply -f $SCRIPT_DIR/config/tmp_cert-manager-example-app.yaml
 wait_spinner 15
 
 # Run test with curl
-# Run test with curl
 curl --cacert <(oc get secret -n cert-manager-monitor-ns test-client-tls-monitor -o jsonpath='{.data.ca\.crt}' | base64 -d) \
   -v https://$HOST

@@ -15,14 +15,14 @@ spec:
         severity: critical
       annotations:
         summary: "Certificate renewal failing for {{ $labels.name }}"
-        description: "The certificate {{ $labels.name }} in namespace {{ $labels.namespace }} has failed to renew and is no longer in a 'Ready' state. Check CertificateRequest or Issuer configuration."
+        description: "The certificate {{ $labels.name }} in namespace {{ $labels.exported_namespace }} has failed to renew and is no longer in a 'Ready' state. Check CertificateRequest or Issuer configuration."
         runbook_url: "https://cert-manager.io/docs/troubleshooting/"
     - alert: CertificateExpiringSoon
       expr: |
-        (certmanager_certificate_expiration_timestamp_seconds - time()) / 3600 < 48
+        (certmanager_certificate_expiration_timestamp_seconds - time()) / 3600 < 0.8
       for: 5m
       labels:
         severity: warning
       annotations:
-        summary: "Certificate for {{ $labels.name }} expires in less than 48 hours"
-        description: "The certificate {{ $labels.name }} in namespace {{ $labels.namespace }} is approaching expiration and a renewal hasn't succeeded yet."
+        summary: "Certificate for {{ $labels.name }} expires in less than 5 minutes"
+        description: "The certificate {{ $labels.name }} in namespace {{ $labels.exported_namespace }} is approaching expiration and a renewal hasn't succeeded yet."
