@@ -8,3 +8,4 @@ OPERATOR_DIR=$(sed "s|$DEMO_SRC_DIR|operator|g" <<< "$SCRIPT_DIR")
 /bin/bash $OPERATOR_DIR/install.sh
 
 oc apply -f $SCRIPT_DIR/config/cluster-monitoring-config.yaml
+oc apply -f $SCRIPT_DIR/config/servicemonitor-cert-manager.yaml

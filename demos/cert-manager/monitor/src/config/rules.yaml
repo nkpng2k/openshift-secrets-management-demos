@@ -1,50 +1,28 @@
-# apiVersion: monitoring.openshift.io/v1
-# kind: AlertingRule
-# metadata:
-#   name: cm-num-csr
-#   namespace: openshift-monitoring
-# spec:
-#   groups:
-#   - name: cm-num-csr
-#     rules:
-#     - alert: ClusterNumberCertificateSigningRequest
-#       expr: delta(cluster:usage:resources:sum{resource="certificates.cert-manager.io"}[30m]) > 4
-#       for: 5m
-#       labels:
-#         severity: warning
-# ---
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
-  name: failed-renewal-cert-alert
-  namespace: cert-manager 
+  name: certificate-renewal-stuck
+  namespace: cert-manager
 spec:
   groups:
-  - name: failed-renewal-cert-alertin
+  - name: cert-manager-failure-alerts
     rules:
-    - alert: CertFailedRenewal
-      expr: certmanager_certificate_renewal_timestamp_seconds - time() < 0
+    - alert: CertificateRenewalStuck
+      expr: |
+        certmanager_certificate_ready_status{condition="True"} == 0
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Certificate renewal failing for {{ $labels.name }}"
+        description: "The certificate {{ $labels.name }} in namespace {{ $labels.namespace }} has failed to renew and is no longer in a 'Ready' state. Check CertificateRequest or Issuer configuration."
+        runbook_url: "https://cert-manager.io/docs/troubleshooting/"
+    - alert: CertificateExpiringSoon
+      expr: |
+        (certmanager_certificate_expiration_timestamp_seconds - time()) / 3600 < 48
       for: 5m
       labels:
         severity: warning
       annotations:
-        summary: "Certificate {{ $labels.name }} failed renewal"
-        description: "{{ $labels.name }} in {{ $labels.namespace }} failed to renew for 5 minutes"
----
-apiVersion: monitoring.coreos.com/v1
-kind: PrometheusRule
-metadata:
-  name: certificate-not-ready
-  namespace: cert-manager 
-spec:
-  groups:
-  - name: not-ready-cert-alert
-    rules:
-    - alert: CertFailedRenewal
-      expr: certmanager_certificate_renewal_timestamp_seconds - time() < 0
-      for: 5m
-      labels:
-        severity: warning
-      annotations:
-        summary: "Certificate {{ $labels.name }} failed renewal"
-        description: "{{ $labels.name }} in {{ $labels.namespace }} failed to renew for 5 minutes"
+        summary: "Certificate for {{ $labels.name }} expires in less than 48 hours"
+        description: "The certificate {{ $labels.name }} in namespace {{ $labels.namespace }} is approaching expiration and a renewal hasn't succeeded yet."

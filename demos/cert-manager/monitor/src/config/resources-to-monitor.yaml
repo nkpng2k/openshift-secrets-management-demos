@@ -13,7 +13,7 @@ metadata:
   namespace: cert-manager-monitor-ns
 spec:
   duration: 60m
-  renewBefore: 50m
+  renewBefore: 58m
   isCA: true
   commonName: test-ca-monitor
   subject:
@@ -46,7 +46,7 @@ metadata:
   namespace: cert-manager-monitor-ns
 spec:
   duration: 60m
-  renewBefore: 50m
+  renewBefore: 58m
   secretName: test-client-tls-monitor
   isCA: false
   usages:
