@@ -12,13 +12,15 @@ oc project eso-argo-demo-ns
 oc label namespace eso-argo-demo-ns "argocd.argoproj.io/managed-by=openshift-gitops"
 
 # Simple input for necessary information
-echo "Enter GitHub Repo: "
+echo "Enter GitHub Repo (https://github.com/project/repository): "
 read GH_REPO
 
-echo "Enter application directory path: "
+echo "Enter application directory path"
+echo "This is the path to the deployment manifests"
+echo "from the root directory of your GitHub repo (src/hello-openshift): "
 read GH_PATH
 
-echo "Enter branch name: "
+echo "Enter branch name (ex. main): "
 read GH_BRANCH
 
 sed \

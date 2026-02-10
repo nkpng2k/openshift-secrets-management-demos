@@ -14,7 +14,8 @@ if [[ $SA_ISSUER == "" ]]; then
 fi
 
 # Get location of pem key from user
-echo "Input the path to pem file: "
+echo "For this demo, we copy your .pem file from your local machine to the Vault pod"
+echo "Input the path to pem file (ex. '/path/to/local/directory/name.pem'): "
 read PEM_PATH
 echo "Copying PEM Key to Vault Pod"
 oc cp $PEM_PATH hashicorp-vault/vault-0:/tmp/key.pem
