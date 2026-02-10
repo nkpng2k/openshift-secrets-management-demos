@@ -10,6 +10,9 @@ yaml manifests are included in the [resources](./resources/) directory.
 You can copy these into a private repository of your choosing and create
 the install your GitHub App for thate repository.
 
+Most of the steps in this demo follow the instructions from the
+external secrets operator documentation for the [GitHub Generator](https://external-secrets.io/latest/api/generator/github/)
+
 ## Prerequisites
 
 Must have the following installed:
