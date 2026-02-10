@@ -13,13 +13,13 @@ oc create serviceaccount -n openshift-gitops eso-demo-sa
 IP_ADDRESS=$(oc get svc vault -n hashicorp-vault -o 'jsonpath={..spec.clusterIP}')
 
 # Simple input for necessary information
-echo "Enter GitHub App ID: "
+echo "Enter GitHub App ID (1234567): "
 read GH_APP_ID
 
-echo "Enter GitHub Install ID: "
+echo "Enter GitHub Install ID (123456789): "
 read GH_INSTALL_ID
 
-echo "Enter GitHub Repo: "
+echo "Enter GitHub Repo (https://github.com/project/repository): "
 read GH_REPO
 
 sed \

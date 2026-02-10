@@ -10,6 +10,9 @@ yaml manifests are included in the [resources](./resources/) directory.
 You can copy these into a private repository of your choosing and create
 the install your GitHub App for thate repository.
 
+Most of the steps in this demo follow the instructions from the
+external secrets operator documentation for the [GitHub Generator](https://external-secrets.io/latest/api/generator/github/)
+
 ## Prerequisites
 
 Must have the following installed:
@@ -21,6 +24,24 @@ Must have admin credentials for an OpenShift cluster and be logged in via:
 
 Must have an `App ID` and `Installation ID` from GitHub after properly
 configuring your repository with your created GitHub App.
+
+Must have a `.pem` file downloaded from GitHub. The `.pem` file can be
+generated from the `Developer Settings` of your GitHub profile, and
+you should make note of _where_ the `.pem` file is saved to your local
+machine.
+
+NOTE: when asked for inputs, always enter input without whitespace. The
+inputs are expected in the following formats:
+* Path to PEM File: `/path/to/local/directory/file.pem`
+* GitHub App ID: `1234567` (7 digit ID from GitHub)
+* GitHub Install ID: `123456789` (9 digit ID from GitHub)
+* GitHub Repo: `https://github.com/project/repository`
+* Application Directory Path: `src/hello-openshift`
+  * NOTE: the above assumes that there is a directory path called
+  `src/hello-openshift` that exists in the root directory of the
+  GitHub repository *AND* that the deployment yaml manifests for
+  ArgoCD to deploy exist *inside* the directory `hello-openshift`
+* Branch Name: `main` (the name of the GitHub branch for ArgoCD to deploy)
 
 ## Steps
 
@@ -43,10 +64,12 @@ where to point the demo to for some things.
 
 # Configures the necessary ESO resources including the token Generator
 # See validation steps below
+# Make sure to enter all inputs without white space
 ./03_setup_eso_resources.sh
 
 # Deploys a sample application with ArgoCD
 # See validation steps below
+# Make sure to enter all inputs without white space
 ./04_deploy_argo_app.sh
 
 # Cleanup step. Tearsdown the resources created during the prior steps
