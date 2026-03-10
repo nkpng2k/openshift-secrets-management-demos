@@ -54,6 +54,20 @@ rules:
 - apiGroups: ["external-secrets.io"]
   resources: ["externalsecrets", "secretstores", "pushsecrets", "generators"]
   verbs: ["*"]
+# 5. OLM / Installed Operators Visibility
+# This allows the user to see and manage operators already installed in the namespace
+- apiGroups: ["operators.coreos.com"]
+  resources: ["subscriptions", "installplans", "clusterserviceversions", "operatorgroups"]
+  verbs: ["*"]
+# 6. Operator Metadata Discovery
+# Required for the UI to display package and catalog information correctly
+- apiGroups: ["packages.operators.coreos.com"]
+  resources: ["packagemanifests"]
+  verbs: ["get", "list", "watch"]
+# 7. Project/Namespace Visibility (Crucial for the Web Console)
+- apiGroups: ["project.openshift.io", ""]
+  resources: ["projects", "namespaces"]
+  verbs: ["get", "list", "watch"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
