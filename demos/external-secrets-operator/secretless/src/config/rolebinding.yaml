@@ -1,0 +1,84 @@
+# USER ROLE AND ROLEBINDING
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: demo-user-limited-role
+  namespace: demo-namespace-user
+rules:
+# 1. Permission to see the Project in the Console/CLI
+- apiGroups: ["project.openshift.io"]
+  resources: ["projects"]
+  verbs: ["get"]
+# 2. Standard Developer Permissions (Apps, Services, Pods, ConfigMaps, etc.)
+- apiGroups: ["", "apps", "autoscaling", "batch", "extensions", "networking.k8s.io", "route.openshift.io", "image.openshift.io"]
+  resources: ["pods", "deployments", "services", "routes", "configmaps", "persistentvolumeclaims", "builds", "imagestreams", "namespaces"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+# 3. Restricted Secret Permissions
+- apiGroups: [""]
+  resources: ["secrets"]
+  verbs: ["list"] # ONLY list permitted
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: demo-user-limited-rolebinding
+  namespace: demo-namespace-user
+subjects:
+- kind: User
+  name: demo_user
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: demo-user-limited-role
+  apiGroup: rbac.authorization.k8s.io
+---
+# ADMIN ROLE AND ROLEBINDING
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: demo-admin-eso-limited-role
+rules:
+# 1. Admin powers for non-core groups (Apps, Networking, etc.)
+- apiGroups: ["apps", "autoscaling", "batch", "extensions", "networking.k8s.io", "route.openshift.io", "image.openshift.io"]
+  resources: ["*"]
+  verbs: ["*"]
+# 2. Admin powers for Core Group ("") EXCEPT Secrets
+- apiGroups: [""]
+  resources: ["pods", "services", "configmaps", "persistentvolumeclaims", "nodes", "namespaces", "endpoints", "resourcequotas"]
+  verbs: ["*"]
+# 3. Specifically restricted Secrets permissions
+- apiGroups: [""]
+  resources: ["secrets"]
+  verbs: ["list"]
+# 4. External Secrets Operator permissions
+- apiGroups: ["external-secrets.io"]
+  resources: ["externalsecrets", "secretstores", "pushsecrets", "generators"]
+  verbs: ["*"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: demo-admin-limited-rolebinding
+  namespace: demo-namespace-admin
+subjects:
+- kind: User
+  name: demo_admin
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: ClusterRole
+  name: demo-admin-eso-limited-role
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: demo-admin-limited-rolebinding
+  namespace: demo-namespace-user
+subjects:
+- kind: User
+  name: demo_admin
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: ClusterRole
+  name: demo-admin-eso-limited-role
+  apiGroup: rbac.authorization.k8s.io

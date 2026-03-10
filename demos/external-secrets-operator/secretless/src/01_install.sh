@@ -7,3 +7,7 @@ OPERATOR_DIR=$(sed "s|$DEMO_SRC_DIR|operator|g" <<< "$SCRIPT_DIR")
 # Run generalized install scripts
 /bin/bash $OPERATOR_DIR/install_vault.sh
 /bin/bash $OPERATOR_DIR/install.sh
+
+# Create 2 Namespaces
+oc new-project demo-namespace-admin
+oc new-project demo-namespace-user
