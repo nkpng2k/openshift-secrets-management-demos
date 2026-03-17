@@ -40,7 +40,7 @@ echo "$ADMIN_USER can list secrets, should see list of secrets"
 oc get secrets -n $ADMIN_NS --as $ADMIN_USER
 oc get secrets -n $USER_NS --as $ADMIN_USER
 echo ""
-echo "$ADMIN_USER CANNOT get secrets, should see forbidden error" 
+echo "$ADMIN_USER CANNOT describe secrets, should see forbidden error" 
 oc get secret vault-secret-example -n $USER_NS --as $ADMIN_USER
 oc get secret vault-special-secret-example -n $USER_NS --as $ADMIN_USER
 echo ""
@@ -48,6 +48,6 @@ echo "$ADMIN_USER can list externalsecrets, should see list of externalsecrets"
 oc get externalsecrets -n $ADMIN_NS --as $ADMIN_USER
 oc get externalsecrets -n $USER_NS --as $ADMIN_USER
 echo ""
-echo "$ADMIN_USER can get externalsecrets, should see externalsecret details (head 5)"
+echo "$ADMIN_USER can describe externalsecrets, should see externalsecret details (head 5)"
 oc describe externalsecrets vault-external-secret-admin -n $ADMIN_NS --as $ADMIN_USER | head -n 5
 oc describe externalsecrets vault-external-secret-user -n $USER_NS --as $ADMIN_USER | head -n 5
