@@ -62,6 +62,23 @@ wait_spinner() {
   printf "\n"
 }
 
+# Utility function validating output of permissions checks
+# $1: resource action (list, get, patch)
+# $2: resource name (secret, pod, CRD)
+# $3: namespace
+# $4: user to attempt action as (demo_admin, demo_user, cluster-admin)
+# $5: expected result (yes, no)
+can_i() {
+  echo "Verifying if user: $4 can $1 $2 in ns $3"
+  RESULT=$(oc auth can-i $1 $2 -n $3 --as $4)
+  if [[ $RESULT != $5 ]];
+  then
+    echo "Got $RESULT, when expected $5"
+    exit 1
+  fi
+  echo "SUCCESS: got $RESULT, and expected $5"
+}
+
 # Helper functions
 get_pod_status() {
   echo $(oc get pods $1 \
