@@ -93,3 +93,12 @@ via the OpenShift Console. To do this:
   ![Success List ExternalSecret](images/success_list_externalsecret.png)
   - Verify that you can click on the deployed `ExternalSecret` and see its information
   ![Success Describe ExternalSecret](images/success_describe_externalsecret.png)
+
+## Disclaimer
+
+This is a *DEMO* and performs some actions that are *NOT* recommended in a production
+environment. Please be careful when running the scripts in this directory. This demo
+is specifically intended to highlight how to configure RBAC roles and rolebindings
+to limit user visibility of Kubernetes Secrets.
+
+This is not guaranteed to work in all environments, and is only meant to showcase an example of how external secrets operator can consume secrets from an external secret manager in order to help minimize user visibility of Kubernetes Secrets.
