@@ -63,10 +63,53 @@ then
   exit 1
 fi;
 
-oc create secret generic demo-htpass-secret \
+# Configuration
+IDP_NAME="demo_htpasswd_provider"
+SECRET_NAME="demo-htpass-secret"
+
+oc create secret generic $SECRET_NAME \
   --from-file=htpasswd=$HTPASSWD_PATH \
   -n openshift-config
 
-oc patch oauth cluster \
-  --type json \
-  --patch-file $SCRIPT_DIR/config/oauth.yaml
+# 1. Check if the OAuth 'cluster' object has any identityProviders
+CURRENT_IDPS=$(oc get oauth cluster -o json | jq '.spec.identityProviders | length' 2>/dev/null)
+
+# If the command failed or returns null, treat it as 0
+if [[ -z "$CURRENT_IDPS" || "$CURRENT_IDPS" == "null" ]]; then
+    CURRENT_IDPS=0
+fi
+
+echo "Current Identity Providers found: $CURRENT_IDPS"
+
+# 2. Define the Provider Payload
+PROVIDER_JSON='{
+  "name": "'${IDP_NAME}'",
+  "mappingMethod": "claim",
+  "type": "HTPasswd",
+  "htpasswd": {
+    "fileData": {
+      "name": "'${SECRET_NAME}'"
+    }
+  }
+}'
+
+# 3. Logic: If 0, create the list. If > 0, append to the list.
+if [ "$CURRENT_IDPS" -eq 0 ]; then
+    echo "OAuth spec is empty. Applying initial configuration..."
+    
+    # We use a merge patch to initialize the array
+    oc patch oauth cluster --type merge -p "{\"spec\": {\"identityProviders\": [${PROVIDER_JSON}]}}"
+    
+else
+    # Check if a provider with the same name already exists to avoid duplicates
+    EXISTING_CHECK=$(oc get oauth cluster -o json | jq -r ".spec.identityProviders[] | select(.name==\"$IDP_NAME\") | .name")
+    
+    if [ "$EXISTING_CHECK" == "$IDP_NAME" ]; then
+        echo "Error: Identity Provider '$IDP_NAME' already exists. Skipping."
+    else
+        echo "OAuth spec already contains providers. Appending '$IDP_NAME' using JSON add..."
+        
+        # Use the JSON pointer syntax '/-' to append to the array
+        oc patch oauth cluster --type json -p "[{\"op\": \"add\", \"path\": \"/spec/identityProviders/-\", \"value\": ${PROVIDER_JSON}}]"
+    fi
+fi
