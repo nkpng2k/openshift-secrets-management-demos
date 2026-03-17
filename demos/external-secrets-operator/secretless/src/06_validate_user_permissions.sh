@@ -30,14 +30,25 @@ can_i "get" "externalsecrets" $USER_NS $USER_USER $NO
 can_i "impersonate" "serviceaccounts" $ADMIN_NS $USER_USER $NO
 can_i "impersonate" "serviceaccounts" $USER_NS $USER_USER $NO
 
-# # can-i
-# oc whoami --as demo_user
-# oc auth can-i list secrets -n demo-namespace-user --as demo_user
-# oc auth can-i list secrets -n demo-namespace-admin --as demo_user
-# oc auth can-i list externalsecrets -n demo-namespace-admin --as demo_user
-# oc auth can-i list externalsecrets -n demo-namespace-user --as demo_user
-
-# # Attempt to list / get / describe
-# oc get projects --as demo_user
-# oc get secrets -n demo-namespace-user --as demo_user
-# oc get externalsecrets -n demo-namespace-user --as demo_user
+# Functional test to validate demo_user
+echo ""
+echo ""
+echo "Validating that admin user can perform above tested functions"
+echo "YOU MUST VALIDATE THESE VISUALLY"
+echo ""
+echo "$USER_USER can list secrets, should see list of secrets"
+oc get secrets -n $USER_NS --as $USER_USER
+echo "$USER_USER CANNOT list secrets outside of their NS, should see forbidden error"
+oc get secrets -n $ADMIN_NS --as $USER_USER
+echo ""
+echo "$USER_USER CANNOT describe secrets, should see forbidden error"
+oc get secret vault-secret-example -n $USER_NS --as $USER_USER
+oc get secret vault-special-secret-example -n $ADMIN_NS --as $USER_USER
+echo ""
+echo "$USER_USER CANNOT list externalsecrets, should see forbidden error"
+oc get externalsecrets -n $ADMIN_NS --as $USER_USER
+oc get externalsecrets -n $USER_NS --as $USER_USER
+echo ""
+echo "$USER_USER CANNOT describe externalsecrets, should see forbidden error"
+oc describe externalsecrets vault-external-secret-admin -n $ADMIN_NS --as $USER_USER
+oc describe externalsecrets vault-external-secret-user -n $USER_NS --as $USER_USER

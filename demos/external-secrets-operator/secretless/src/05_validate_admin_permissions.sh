@@ -23,19 +23,31 @@ can_i "list" "secrets" $USER_NS $ADMIN_USER $YES
 can_i "list" "externalsecrets" $ADMIN_NS $ADMIN_USER $YES
 can_i "list" "externalsecrets" $USER_NS $ADMIN_USER $YES
 can_i "get" "externalsecrets" $ADMIN_NS $ADMIN_USER $YES
-can_i "get" "externalsecrets" $USER_NS $ADMIN_USER $YESq
+can_i "get" "externalsecrets" $USER_NS $ADMIN_USER $YES
 
 can_i "get" "secrets" $ADMIN_NS $ADMIN_USER $NO
 can_i "get" "secrets" $USER_NS $ADMIN_USER $NO
 can_i "impersonate" "serviceaccounts" $ADMIN_NS $ADMIN_USER $NO
 can_i "impersonate" "serviceaccounts" $USER_NS $ADMIN_USER $NO
 
-# oc auth can-i list secrets -n demo-namespace-user --as demo_admin
-# oc auth can-i list secrets -n demo-namespace-admin --as demo_admin
-# oc auth can-i list externalsecrets -n demo-namespace-admin --as demo_admin
-# oc auth can-i list externalsecrets -n demo-namespace-user --as demo_admin
-
-# # Attempt to list / get / describe
-# oc get projects --as demo_admin
-# oc get secrets -n demo-namespace-user --as demo_admin
-# oc get externalsecrets -n demo-namespace-user --as demo_admin
+# Functional test to validate demo_admin
+echo ""
+echo ""
+echo "Validating that admin user can perform above tested functions"
+echo "YOU MUST VALIDATE THESE VISUALLY"
+echo ""
+echo "$ADMIN_USER can list secrets, should see list of secrets"
+oc get secrets -n $ADMIN_NS --as $ADMIN_USER
+oc get secrets -n $USER_NS --as $ADMIN_USER
+echo ""
+echo "$ADMIN_USER CANNOT get secrets, should see forbidden error" 
+oc get secret vault-secret-example -n $USER_NS --as $ADMIN_USER
+oc get secret vault-special-secret-example -n $USER_NS --as $ADMIN_USER
+echo ""
+echo "$ADMIN_USER can list externalsecrets, should see list of externalsecrets"
+oc get externalsecrets -n $ADMIN_NS --as $ADMIN_USER
+oc get externalsecrets -n $USER_NS --as $ADMIN_USER
+echo ""
+echo "$ADMIN_USER can get externalsecrets, should see externalsecret details (head 5)"
+oc describe externalsecrets vault-external-secret-admin -n $ADMIN_NS --as $ADMIN_USER | head -n 5
+oc describe externalsecrets vault-external-secret-user -n $USER_NS --as $ADMIN_USER | head -n 5
