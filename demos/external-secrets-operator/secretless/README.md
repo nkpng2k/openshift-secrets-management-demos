@@ -67,17 +67,29 @@ Must have admin credentials for an OpenShift cluster and be logged in via:
 
 # Validates that the created and configured users CANNOT access the Secrets managed
 # by ESO and that only the `demo_admin` user can access the ESO CRDs
-./05_validate_permissions.sh
+./05_validate_admin_permissions.sh
+./06_validate_admin_permissions.sh
 
 # Cleanup step. Tearsdown the resources created during the prior steps.
-./06_cleanup.sh
+./07_cleanup.sh
 ```
 
 ## Validation
 
-You can run the `./05_validate_permissions.sh` shell script to validate access
+You can run the `./05_validate_admin_permissions.sh` and 
+`./06_validate_user_permissions.sh` shell script to validate access
 via CLI, but you should also validate the ability to view the Secrets and CRDs
 via the OpenShift Console. To do this:
 1. Log into the OpenShift Console with the appropriate user credentials
 2. Select the `Workloads` tab on the left-hand tool bar
 3. Select the `Secrets` option in the `Workloads` dropdown menu
+  - Verfiy that the user can see a list of secrets
+  ![Success List Secret](images/success_list_secret.png)
+  - Verify that when you click on a specific secret, you get a permissions error
+  ![Forbidden Describe Secret](images/forbidden_describe_secret.png)
+4. As the `demo_admin` user, select the `Ecosystem` tab and select `Installed Operators`. You might need to select a specific project first.
+  - Verify that you can see the installed External Secrets Operator
+  - Verify that you can see a list of deployed `ExternalSecrets` in the selected project only
+  ![Success List ExternalSecret](images/success_list_externalsecret.png)
+  - Verify that you can click on the deployed `ExternalSecret` and see its information
+  ![Success Describe ExternalSecret](images/success_describe_externalsecret.png)
