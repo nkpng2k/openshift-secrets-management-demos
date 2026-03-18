@@ -68,7 +68,7 @@ Must have admin credentials for an OpenShift cluster and be logged in via:
 # Validates that the created and configured users CANNOT access the Secrets managed
 # by ESO and that only the `demo_admin` user can access the ESO CRDs
 ./05_validate_admin_permissions.sh
-./06_validate_admin_permissions.sh
+./06_validate_user_permissions.sh
 
 # Cleanup step. Tearsdown the resources created during the prior steps.
 ./07_cleanup.sh
