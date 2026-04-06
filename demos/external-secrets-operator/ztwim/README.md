@@ -64,13 +64,6 @@ cannot authenticate with another team's role, even if they have access to the
 JWT — the `sub` claim in the token won't match. This provides cryptographic
 identity isolation.
 
-### No custom images
-
-The demo uses only upstream/vendor images:
-- ESO upstream Helm chart
-- Red Hat SPIRE agent image (from ZTWIM operator)
-- HashiCorp Vault (UBI)
-
 ## Prerequisites
 
 Must have the following installed:
