@@ -13,19 +13,6 @@ spec:
       kubernetes.io/metadata.name: ESO_NAMESPACE
   jwtSVIDTTL: "1h"
 ---
-apiVersion: v1
-kind: Service
-metadata:
-  name: jwt-server
-  namespace: ESO_NAMESPACE
-spec:
-  selector:
-    app.kubernetes.io/name: external-secrets
-  ports:
-    - port: 8888
-      targetPort: 8888
-      protocol: TCP
----
 apiVersion: generators.external-secrets.io/v1alpha1
 kind: Webhook
 metadata:

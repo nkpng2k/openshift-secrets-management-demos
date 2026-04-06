@@ -60,7 +60,7 @@ metadata:
   name: team-jwt-generator
   namespace: TEAM_NAMESPACE
 spec:
-  url: "http://jwt-server.ESO_NAMESPACE.svc:8888/fetch?spiffeID=spiffe://TRUST_DOMAIN/eso/TEAM_NAMESPACE"
+  url: "http://localhost:8888/fetch?spiffeID=spiffe://TRUST_DOMAIN/eso/TEAM_NAMESPACE"
   result:
     jsonPath: "$"
   timeout: 5s

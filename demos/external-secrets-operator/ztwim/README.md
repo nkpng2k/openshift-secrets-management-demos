@@ -26,7 +26,7 @@ Adding a new team does **not** require restarting the ESO pod.
                     ESO Controller Pod
                     +-----------------------------------------------+
 SPIRE Agent         |  jwt-fetcher sidecar (spire-agent image)      |
-+-----------+  CSI  |    Python HTTP server :8888                   |
++-----------+  CSI  |    Python HTTP server :8888 (localhost only)  |
 | Workload  +------>|    GET /fetch?spiffeID=spiffe://.../eso/team-a|
 | API       |       |      -> spire-agent api fetch jwt -spiffeID   |
 +-----------+       |      -> returns {"jwt-svid.token":"<jwt>"}    |
@@ -256,7 +256,7 @@ metadata:
   name: team-jwt-generator
   namespace: team-c
 spec:
-  url: "http://jwt-server.external-secrets.svc:8888/fetch?spiffeID=spiffe://cluster.demo/eso/team-c"
+  url: "http://localhost:8888/fetch?spiffeID=spiffe://cluster.demo/eso/team-c"
   result:
     jsonPath: "\$"
   timeout: 5s

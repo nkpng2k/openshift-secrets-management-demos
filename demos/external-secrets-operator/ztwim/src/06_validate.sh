@@ -116,8 +116,7 @@ if [[ "$PASS" == true ]]; then
 else
   echo "=== SOME VALIDATIONS FAILED ==="
   echo "Troubleshooting:"
-  echo "  spiffe-helper logs: oc logs -n $ESO_NAMESPACE deploy/external-secrets -c spiffe-helper"
-  echo "  jwt-server logs:    oc logs -n $ESO_NAMESPACE deploy/external-secrets -c jwt-server"
+  echo "  jwt-fetcher logs:   oc logs -n $ESO_NAMESPACE deploy/external-secrets -c jwt-fetcher"
   echo "  ESO controller:     oc logs -n $ESO_NAMESPACE deploy/external-secrets -c external-secrets"
   exit 1
 fi
