@@ -12,23 +12,24 @@ than pre-shared credentials, solving the "secret zero" problem.
 ## Architecture
 
 The ESO controller pod runs with a **jwt-fetcher** sidecar injected via Helm
-`extraContainers`. This sidecar uses the Red Hat SPIRE agent image and calls
-`spire-agent api fetch jwt` with the `-spiffeID` flag to fetch per-team JWT
-SVIDs. It also serves the JWT files via Python HTTP server on port 8888.
+`extraContainers`. This sidecar uses the Red Hat SPIRE agent image and runs a
+Python HTTP server on port 8888 that fetches JWT SVIDs on-demand from the SPIRE
+Workload API. When a Webhook Generator makes a request, the sidecar calls
+`spire-agent api fetch jwt -spiffeID <id>` and returns the JWT in the response.
 
 The ESO controller pod is registered with multiple SPIFFE identities via
 separate ClusterSPIFFEID resources — one default identity for
 ClusterSecretStores, plus one per team for namespace-scoped SecretStores.
+Adding a new team does **not** require restarting the ESO pod.
 
 ```
                     ESO Controller Pod
                     +-----------------------------------------------+
 SPIRE Agent         |  jwt-fetcher sidecar (spire-agent image)      |
-+-----------+  CSI  |    spire-agent api fetch jwt                  |
-| Workload  +------>|      -spiffeID default -> jwt-svid.json       |
-| API       |       |      -spiffeID team-a  -> team-a.json         |
-+-----------+       |      -spiffeID team-b  -> team-b.json         |
-                    |    python3 http.server :8888                   |
++-----------+  CSI  |    Python HTTP server :8888                   |
+| Workload  +------>|    GET /fetch?spiffeID=spiffe://.../eso/team-a|
+| API       |       |      -> spire-agent api fetch jwt -spiffeID   |
++-----------+       |      -> returns {"jwt-svid.token":"<jwt>"}    |
                     +-----------------------------------------------+
                            |                           |
               ClusterSecretStore path       SecretStore path
@@ -153,12 +154,14 @@ SUCCESS: ClusterSecretStore and SecretStore secrets match for each team.
 Adding a new team requires:
 
 1. A ClusterSPIFFEID for the team's SPIFFE identity on the ESO controller pod
-2. An entry in the `jwt-fetch-config` ConfigMap (and ESO pod restart)
-3. A Vault role + policy (both cluster-scoped and local roles)
-4. A ClusterSecretStore and/or namespace-scoped SecretStore
+2. A Vault role + policy (both cluster-scoped and local roles)
+3. A ClusterSecretStore and/or namespace-scoped SecretStore
+4. A Webhook Generator + ExternalSecret for the team-jwt Secret
 5. ExternalSecrets in the team namespace
 
-No new pods, no new sync infrastructure, no image builds.
+No new pods, no ESO restarts, no image builds. The jwt-fetcher sidecar
+fetches JWTs on-demand — new SPIFFE identities are available as soon as the
+ClusterSPIFFEID is registered by the SPIRE controller.
 
 ## Troubleshooting
 

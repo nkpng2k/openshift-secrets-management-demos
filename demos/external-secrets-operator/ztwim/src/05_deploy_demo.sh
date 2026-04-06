@@ -44,10 +44,11 @@ for NS in $TEAM_A_NAMESPACE $TEAM_B_NAMESPACE; do
   oc apply -f $SCRIPT_DIR/config/tmp_external_secret_${NS}.yaml
 
   # Namespace-scoped Webhook Generator pointing to ESO controller's jwt-fetcher
-  # Requests the team-specific JWT (e.g., /team-a.json)
+  # Passes the team's SPIFFE ID as a query parameter for on-demand JWT fetch
   sed \
     -e "s|TEAM_NAMESPACE|$NS|g" \
     -e "s|ESO_NAMESPACE|$ESO_NAMESPACE|g" \
+    -e "s|TRUST_DOMAIN|$SPIRE_TRUST_DOMAIN|g" \
     $SCRIPT_DIR/config/team_webhook_generator.yaml > $SCRIPT_DIR/config/tmp_team_webhook_generator_${NS}.yaml
   oc apply -f $SCRIPT_DIR/config/tmp_team_webhook_generator_${NS}.yaml
 

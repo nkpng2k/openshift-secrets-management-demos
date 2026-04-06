@@ -11,14 +11,11 @@ echo "=== Installing ESO via Helm (with SPIFFE sidecars) ==="
 # Create ESO namespace
 oc new-project $ESO_NAMESPACE
 
-# Deploy jwt-fetch-config ConfigMap (must exist before Helm install)
+# Deploy jwt-fetch-script ConfigMap (must exist before Helm install)
 sed \
   -e "s|ESO_NAMESPACE|$ESO_NAMESPACE|g" \
-  -e "s|TEAM_A_NAMESPACE|$TEAM_A_NAMESPACE|g" \
-  -e "s|TEAM_B_NAMESPACE|$TEAM_B_NAMESPACE|g" \
-  -e "s|TRUST_DOMAIN|$SPIRE_TRUST_DOMAIN|g" \
-  $SCRIPT_DIR/config/jwt_fetch_config.yaml > $SCRIPT_DIR/config/tmp_jwt_fetch_config.yaml
-oc apply -f $SCRIPT_DIR/config/tmp_jwt_fetch_config.yaml
+  $SCRIPT_DIR/config/jwt_fetch_script.yaml > $SCRIPT_DIR/config/tmp_jwt_fetch_script.yaml
+oc apply -f $SCRIPT_DIR/config/tmp_jwt_fetch_script.yaml
 
 # Template ESO Helm values
 sed \

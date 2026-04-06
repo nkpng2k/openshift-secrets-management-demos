@@ -4,7 +4,7 @@ metadata:
   name: spiffe-jwt-generator
   namespace: ESO_NAMESPACE
 spec:
-  url: "http://localhost:8888/jwt-svid.json"
+  url: "http://localhost:8888/fetch"
   result:
     jsonPath: "$"
   timeout: 5s
