@@ -163,6 +163,174 @@ No new pods, no ESO restarts, no image builds. The jwt-fetcher sidecar
 fetches JWTs on-demand — new SPIFFE identities are available as soon as the
 ClusterSPIFFEID is registered by the SPIRE controller.
 
+### Example: Adding team-c
+
+```sh
+# 1. Create the namespace
+oc new-project team-c
+
+# 2. Register a SPIFFE identity for team-c on the ESO controller pod
+oc apply -f - <<EOF
+apiVersion: spire.spiffe.io/v1alpha1
+kind: ClusterSPIFFEID
+metadata:
+  name: eso-team-c
+spec:
+  className: "zero-trust-workload-identity-manager-spire"
+  spiffeIDTemplate: "spiffe://cluster.demo/eso/team-c"
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: external-secrets
+  namespaceSelector:
+    matchLabels:
+      kubernetes.io/metadata.name: external-secrets
+  jwtSVIDTTL: "1h"
+EOF
+
+# 3. Configure Vault: policy, roles, and seed data
+oc exec vault-0 -n hashicorp-vault -- sh -c '
+  vault policy write team-c-policy - <<POLICY
+path "kv/data/team-c/*" {
+  capabilities = ["read"]
+}
+POLICY
+
+  vault write auth/jwt/role/team-c-role \
+    role_type=jwt bound_audiences=vault \
+    bound_subject="spiffe://cluster.demo/ns/external-secrets/sa/external-secrets" \
+    user_claim=sub token_policies=team-c-policy token_ttl=1h
+
+  vault write auth/jwt/role/team-c-local-role \
+    role_type=jwt bound_audiences=vault \
+    bound_subject="spiffe://cluster.demo/eso/team-c" \
+    user_claim=sub token_policies=team-c-policy token_ttl=1h
+
+  vault kv put kv/team-c/credentials username=team-c-user password=s3cret-team-c-012
+'
+
+# 4. Get Vault service IP
+VAULT_IP=$(oc get svc vault -n hashicorp-vault -o jsonpath='{.spec.clusterIP}')
+
+# 5. Deploy ClusterSecretStore + ExternalSecret
+oc apply -f - <<EOF
+apiVersion: external-secrets.io/v1
+kind: ClusterSecretStore
+metadata:
+  name: vault-team-c
+spec:
+  provider:
+    vault:
+      server: "http://${VAULT_IP}:8200"
+      path: "kv"
+      version: "v2"
+      auth:
+        jwt:
+          path: "jwt"
+          role: "team-c-role"
+          secretRef:
+            name: "spiffe-jwt"
+            key: "jwt-svid.token"
+            namespace: "external-secrets"
+---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: team-credentials
+  namespace: team-c
+spec:
+  refreshInterval: "1m"
+  secretStoreRef:
+    name: vault-team-c
+    kind: ClusterSecretStore
+  target:
+    name: team-secret
+  data:
+    - secretKey: username
+      remoteRef:
+        key: team-c/credentials
+        property: username
+    - secretKey: password
+      remoteRef:
+        key: team-c/credentials
+        property: password
+EOF
+
+# 6. Deploy namespace-scoped Webhook Generator + SecretStore
+oc apply -f - <<EOF
+apiVersion: generators.external-secrets.io/v1alpha1
+kind: Webhook
+metadata:
+  name: team-jwt-generator
+  namespace: team-c
+spec:
+  url: "http://jwt-server.external-secrets.svc:8888/fetch?spiffeID=spiffe://cluster.demo/eso/team-c"
+  result:
+    jsonPath: "\$"
+  timeout: 5s
+---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: team-jwt-refresh
+  namespace: team-c
+spec:
+  refreshInterval: "5m"
+  dataFrom:
+    - sourceRef:
+        generatorRef:
+          apiVersion: generators.external-secrets.io/v1alpha1
+          kind: Webhook
+          name: team-jwt-generator
+  target:
+    name: team-jwt
+---
+apiVersion: external-secrets.io/v1
+kind: SecretStore
+metadata:
+  name: vault-local
+  namespace: team-c
+spec:
+  provider:
+    vault:
+      server: "http://${VAULT_IP}:8200"
+      path: "kv"
+      version: "v2"
+      auth:
+        jwt:
+          path: "jwt"
+          role: "team-c-local-role"
+          secretRef:
+            name: "team-jwt"
+            key: "jwt-svid.token"
+---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: team-credentials-local
+  namespace: team-c
+spec:
+  refreshInterval: "1m"
+  secretStoreRef:
+    name: vault-local
+    kind: SecretStore
+  target:
+    name: team-secret-local
+  data:
+    - secretKey: username
+      remoteRef:
+        key: team-c/credentials
+        property: username
+    - secretKey: password
+      remoteRef:
+        key: team-c/credentials
+        property: password
+EOF
+
+# 7. Validate
+oc get secret team-secret -n team-c -o jsonpath='{.data.password}' | base64 -d
+oc get secret team-secret-local -n team-c -o jsonpath='{.data.password}' | base64 -d
+```
+
 ## Troubleshooting
 
 - **spiffe-jwt Secret not appearing**: Check jwt-fetcher logs:
