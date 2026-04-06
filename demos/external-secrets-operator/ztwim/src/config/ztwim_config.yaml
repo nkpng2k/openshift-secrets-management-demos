@@ -1,4 +1,12 @@
 apiVersion: operator.openshift.io/v1alpha1
+kind: ZeroTrustWorkloadIdentityManager
+metadata:
+  name: cluster
+spec:
+  trustDomain: TRUST_DOMAIN
+  clusterName: demo
+---
+apiVersion: operator.openshift.io/v1alpha1
 kind: SpireServer
 metadata:
   name: cluster

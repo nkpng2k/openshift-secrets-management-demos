@@ -38,17 +38,13 @@ echo "Waiting for ESO webhook pod..."
 oc wait --for=condition=ready --timeout=300s \
   pod -l app.kubernetes.io/name=external-secrets-webhook -n $ESO_NAMESPACE
 
-echo "=== Deploying Webhook Generator and JWT ExternalSecret ==="
+echo "=== Deploying ESO Resources (ClusterSPIFFEID, Service, Webhook Generator, JWT ExternalSecret) ==="
 
 sed \
+  -e "s|TRUST_DOMAIN|$SPIRE_TRUST_DOMAIN|g" \
   -e "s|ESO_NAMESPACE|$ESO_NAMESPACE|g" \
-  $SCRIPT_DIR/config/webhook_generator.yaml > $SCRIPT_DIR/config/tmp_webhook_generator.yaml
-oc apply -f $SCRIPT_DIR/config/tmp_webhook_generator.yaml
-
-sed \
-  -e "s|ESO_NAMESPACE|$ESO_NAMESPACE|g" \
-  $SCRIPT_DIR/config/jwt_external_secret.yaml > $SCRIPT_DIR/config/tmp_jwt_external_secret.yaml
-oc apply -f $SCRIPT_DIR/config/tmp_jwt_external_secret.yaml
+  $SCRIPT_DIR/config/eso_resources.yaml > $SCRIPT_DIR/config/tmp_eso_resources.yaml
+oc apply -f $SCRIPT_DIR/config/tmp_eso_resources.yaml
 
 echo "Waiting for spiffe-jwt Secret..."
 RETRIES=0

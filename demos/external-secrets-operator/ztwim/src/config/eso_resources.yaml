@@ -1,0 +1,54 @@
+apiVersion: spire.spiffe.io/v1alpha1
+kind: ClusterSPIFFEID
+metadata:
+  name: eso-controller
+spec:
+  className: "zero-trust-workload-identity-manager-spire"
+  spiffeIDTemplate: "spiffe://TRUST_DOMAIN/ns/{{ .PodMeta.Namespace }}/sa/{{ .PodSpec.ServiceAccountName }}"
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: external-secrets
+  namespaceSelector:
+    matchLabels:
+      kubernetes.io/metadata.name: ESO_NAMESPACE
+  jwtSVIDTTL: "1h"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: jwt-server
+  namespace: ESO_NAMESPACE
+spec:
+  selector:
+    app.kubernetes.io/name: external-secrets
+  ports:
+    - port: 8888
+      targetPort: 8888
+      protocol: TCP
+---
+apiVersion: generators.external-secrets.io/v1alpha1
+kind: Webhook
+metadata:
+  name: spiffe-jwt-generator
+  namespace: ESO_NAMESPACE
+spec:
+  url: "http://localhost:8888/fetch"
+  result:
+    jsonPath: "$"
+  timeout: 5s
+---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: spiffe-jwt-refresh
+  namespace: ESO_NAMESPACE
+spec:
+  refreshInterval: "5m"
+  dataFrom:
+    - sourceRef:
+        generatorRef:
+          apiVersion: generators.external-secrets.io/v1alpha1
+          kind: Webhook
+          name: spiffe-jwt-generator
+  target:
+    name: spiffe-jwt

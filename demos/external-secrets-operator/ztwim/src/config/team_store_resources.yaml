@@ -1,4 +1,23 @@
 apiVersion: external-secrets.io/v1
+kind: SecretStore
+metadata:
+  name: vault-local
+  namespace: TEAM_NAMESPACE
+spec:
+  provider:
+    vault:
+      server: "http://VAULT_SVC_CLUSTER_IP:8200"
+      path: "kv"
+      version: "v2"
+      auth:
+        jwt:
+          path: "VAULT_JWT_AUTH_PATH"
+          role: "TEAM_NAMESPACE-local-role"
+          secretRef:
+            name: "team-jwt"
+            key: "jwt-svid.token"
+---
+apiVersion: external-secrets.io/v1
 kind: ExternalSecret
 metadata:
   name: team-credentials-local
