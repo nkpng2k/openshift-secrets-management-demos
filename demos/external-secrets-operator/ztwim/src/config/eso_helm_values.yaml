@@ -1,0 +1,67 @@
+extraVolumes:
+  - name: spiffe-workload-api
+    csi:
+      driver: csi.spiffe.io
+      readOnly: true
+  - name: jwt-svids
+    emptyDir:
+      medium: Memory
+      sizeLimit: 1Mi
+  - name: jwt-fetch-config
+    configMap:
+      name: jwt-fetch-config
+
+extraContainers:
+  - name: jwt-fetcher
+    image: SPIRE_AGENT_IMAGE
+    command:
+      - /bin/sh
+      - -c
+      - |
+        SOCKET=/spiffe-workload-api/spire-agent.sock
+
+        # Wait for workload API socket
+        while [ ! -S "$SOCKET" ]; do sleep 1; done
+
+        # Fetch JWTs in a loop
+        while true; do
+          # Fetch the default identity (for ClusterSecretStore)
+          TOKEN=$(/spire-agent api fetch jwt -audience vault -socketPath "$SOCKET" -output json 2>/dev/null | grep -o '"svid":"[^"]*"' | head -1 | cut -d'"' -f4)
+          if [ -n "$TOKEN" ]; then
+            echo "$TOKEN" > /jwt-svids/jwt-svid.token
+            printf '{"jwt-svid.token":"%s"}' "$TOKEN" > /jwt-svids/jwt-svid.json
+          fi
+
+          # Fetch per-team identities from config
+          if [ -f /config/jwt-identities.conf ]; then
+            while IFS=' ' read -r NAME SPIFFE_ID; do
+              [ -z "$NAME" ] && continue
+              TOKEN=$(/spire-agent api fetch jwt -audience vault -spiffeID "$SPIFFE_ID" -socketPath "$SOCKET" -output json 2>/dev/null | grep -o '"svid":"[^"]*"' | head -1 | cut -d'"' -f4)
+              if [ -n "$TOKEN" ]; then
+                echo "$TOKEN" > /jwt-svids/${NAME}.token
+                printf '{"jwt-svid.token":"%s"}' "$TOKEN" > /jwt-svids/${NAME}.json
+              fi
+            done < /config/jwt-identities.conf
+          fi
+
+          sleep 30
+        done &
+
+        # Wait for at least one token before starting HTTP server
+        while [ ! -f /jwt-svids/jwt-svid.token ]; do sleep 2; done
+
+        # Serve all JWT files via HTTP
+        cd /jwt-svids && python3 -m http.server 8888
+    volumeMounts:
+      - name: spiffe-workload-api
+        mountPath: /spiffe-workload-api
+        readOnly: true
+      - name: jwt-svids
+        mountPath: /jwt-svids
+      - name: jwt-fetch-config
+        mountPath: /config
+        readOnly: true
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop: ["ALL"]

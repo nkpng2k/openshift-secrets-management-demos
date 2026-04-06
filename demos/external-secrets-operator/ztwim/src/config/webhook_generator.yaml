@@ -1,0 +1,10 @@
+apiVersion: generators.external-secrets.io/v1alpha1
+kind: Webhook
+metadata:
+  name: spiffe-jwt-generator
+  namespace: ESO_NAMESPACE
+spec:
+  url: "http://localhost:8888/jwt-svid.json"
+  result:
+    jsonPath: "$"
+  timeout: 5s

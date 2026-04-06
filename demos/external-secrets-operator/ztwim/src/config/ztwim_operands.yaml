@@ -1,0 +1,53 @@
+apiVersion: operator.openshift.io/v1alpha1
+kind: SpireServer
+metadata:
+  name: cluster
+spec:
+  logLevel: info
+  jwtIssuer: "https://oidc-discovery.APPS_DOMAIN"
+  caSubject:
+    commonName: "SPIRE Server CA"
+    organization: "Demo"
+    country: "US"
+  persistence:
+    size: "1Gi"
+    accessMode: ReadWriteOnce
+    storageClass: "gp3-csi"
+  datastore:
+    databaseType: sqlite3
+    connectionString: "/run/spire/data/datastore.sqlite3"
+  caValidity: "24h"
+  defaultX509Validity: "1h"
+  defaultJWTValidity: "5m"
+---
+apiVersion: operator.openshift.io/v1alpha1
+kind: SpireAgent
+metadata:
+  name: cluster
+spec:
+  logLevel: info
+  socketPath: "/run/spire/agent-sockets"
+  nodeAttestor:
+    k8sPSATEnabled: "true"
+  workloadAttestors:
+    k8sEnabled: "true"
+    workloadAttestorsVerification:
+      type: "auto"
+---
+apiVersion: operator.openshift.io/v1alpha1
+kind: SpiffeCSIDriver
+metadata:
+  name: cluster
+spec:
+  agentSocketPath: "/run/spire/agent-sockets"
+  pluginName: "csi.spiffe.io"
+---
+apiVersion: operator.openshift.io/v1alpha1
+kind: SpireOIDCDiscoveryProvider
+metadata:
+  name: cluster
+spec:
+  logLevel: info
+  jwtIssuer: "https://oidc-discovery.APPS_DOMAIN"
+  csiDriverName: "csi.spiffe.io"
+  replicaCount: 1

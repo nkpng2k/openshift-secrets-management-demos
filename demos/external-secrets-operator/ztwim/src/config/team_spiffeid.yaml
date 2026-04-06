@@ -1,0 +1,14 @@
+apiVersion: spire.spiffe.io/v1alpha1
+kind: ClusterSPIFFEID
+metadata:
+  name: eso-TEAM_NAMESPACE
+spec:
+  className: "zero-trust-workload-identity-manager-spire"
+  spiffeIDTemplate: "spiffe://TRUST_DOMAIN/eso/TEAM_NAMESPACE"
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: external-secrets
+  namespaceSelector:
+    matchLabels:
+      kubernetes.io/metadata.name: ESO_NAMESPACE
+  jwtSVIDTTL: "1h"

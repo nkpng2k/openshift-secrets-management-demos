@@ -1,0 +1,14 @@
+apiVersion: spire.spiffe.io/v1alpha1
+kind: ClusterSPIFFEID
+metadata:
+  name: eso-controller
+spec:
+  className: "zero-trust-workload-identity-manager-spire"
+  spiffeIDTemplate: "spiffe://TRUST_DOMAIN/ns/{{ .PodMeta.Namespace }}/sa/{{ .PodSpec.ServiceAccountName }}"
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: external-secrets
+  namespaceSelector:
+    matchLabels:
+      kubernetes.io/metadata.name: ESO_NAMESPACE
+  jwtSVIDTTL: "1h"

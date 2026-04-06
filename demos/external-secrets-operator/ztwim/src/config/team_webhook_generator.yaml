@@ -1,0 +1,10 @@
+apiVersion: generators.external-secrets.io/v1alpha1
+kind: Webhook
+metadata:
+  name: team-jwt-generator
+  namespace: TEAM_NAMESPACE
+spec:
+  url: "http://jwt-server.ESO_NAMESPACE.svc:8888/TEAM_NAMESPACE.json"
+  result:
+    jsonPath: "$"
+  timeout: 5s
