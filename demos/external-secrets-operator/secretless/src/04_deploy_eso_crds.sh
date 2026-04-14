@@ -27,3 +27,13 @@ sed \
   -e "s|VAULT_SVC_CLUSTER_IP|$IP_ADDRESS|g" \
   $SCRIPT_DIR/config/eso_resources.yaml > $SCRIPT_DIR/config/tmp_eso_resources.yaml
 oc apply -f $SCRIPT_DIR/config/tmp_eso_resources.yaml
+
+# Deploy demo pods to showcase events-based debugging
+# - demo-app-success: mounts the ESO-managed secret correctly
+# - demo-app-failure: references a non-existent secret (simulates a typo)
+echo ""
+echo "Deploying demo pods for events demonstration..."
+oc apply -f $SCRIPT_DIR/config/demo_pods.yaml
+echo "Waiting for demo-app-success pod to be ready..."
+oc wait --for=condition=Ready pod/demo-app-success -n demo-namespace-user --timeout=60s
+echo "demo-app-failure pod will remain in ContainerCreating (expected - secret does not exist)"

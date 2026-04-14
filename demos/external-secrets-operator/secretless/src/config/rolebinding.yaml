@@ -13,10 +13,10 @@ rules:
 - apiGroups: ["", "apps", "autoscaling", "batch", "extensions", "networking.k8s.io", "route.openshift.io", "image.openshift.io"]
   resources: ["pods", "deployments", "services", "routes", "configmaps", "persistentvolumeclaims", "builds", "imagestreams", "namespaces"]
   verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
-# 3. Restricted Secret Permissions
+# 3. Event visibility (for diagnosing mount failures, scheduling issues, etc.)
 - apiGroups: [""]
-  resources: ["secrets"]
-  verbs: ["list"] # ONLY list permitted
+  resources: ["events"]
+  verbs: ["get", "list", "watch"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
@@ -42,14 +42,14 @@ rules:
 - apiGroups: ["apps", "autoscaling", "batch", "extensions", "networking.k8s.io", "route.openshift.io", "image.openshift.io"]
   resources: ["*"]
   verbs: ["*"]
-# 2. Admin powers for Core Group ("") EXCEPT Secrets
+# 2. Admin powers for Core Group ("") - NO Secret access
 - apiGroups: [""]
   resources: ["pods", "services", "configmaps", "persistentvolumeclaims", "nodes", "namespaces", "endpoints", "resourcequotas"]
   verbs: ["*"]
-# 3. Specifically restricted Secrets permissions
+# 3. Event visibility (for diagnosing mount failures, sync issues, etc.)
 - apiGroups: [""]
-  resources: ["secrets"]
-  verbs: ["list"]
+  resources: ["events"]
+  verbs: ["get", "list", "watch"]
 # 4. External Secrets Operator permissions
 - apiGroups: ["external-secrets.io"]
   resources: ["externalsecrets", "secretstores", "pushsecrets", "generators"]

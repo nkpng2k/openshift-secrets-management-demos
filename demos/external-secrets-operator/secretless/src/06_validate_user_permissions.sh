@@ -16,11 +16,10 @@ USER_NS="demo-namespace-user"
 YES="yes"
 NO="no"
 
-# User should only be able to list secrets. NO other permissions
-# User should NOT be able to list secrets in admin namespace
-can_i "list" "secrets" $USER_NS $USER_USER $YES
-
+# User should NOT have any access to secrets. Can list events for diagnostics.
+can_i "list" "secrets" $USER_NS $USER_USER $NO
 can_i "list" "secrets" $ADMIN_NS $USER_USER $NO
+can_i "list" "events" $USER_NS $USER_USER $YES
 can_i "get" "secrets" $ADMIN_NS $USER_USER $NO
 can_i "get" "secrets" $USER_NS $USER_USER $NO
 can_i "list" "externalsecrets" $ADMIN_NS $USER_USER $NO
@@ -36,10 +35,21 @@ echo ""
 echo "Validating that admin user can perform above tested functions"
 echo "YOU MUST VALIDATE THESE VISUALLY"
 echo ""
-echo "$USER_USER can list secrets, should see list of secrets"
+echo "$USER_USER CANNOT list secrets, should see forbidden error"
 oc get secrets -n $USER_NS --as $USER_USER
-echo "$USER_USER CANNOT list secrets outside of their NS, should see forbidden error"
 oc get secrets -n $ADMIN_NS --as $USER_USER
+echo ""
+echo "$USER_USER can list events, should see event information"
+oc get events -n $USER_NS --as $USER_USER
+echo ""
+echo "=== EVENTS DEBUGGING DEMO ==="
+echo "Events allow users to diagnose pod issues WITHOUT accessing secrets."
+echo ""
+echo "demo-app-success pod events (should show successful scheduling and mount):"
+oc get events -n $USER_NS --as $USER_USER --field-selector involvedObject.name=demo-app-success
+echo ""
+echo "demo-app-failure pod events (should show mount failure for non-existent secret):"
+oc get events -n $USER_NS --as $USER_USER --field-selector involvedObject.name=demo-app-failure
 echo ""
 echo "$USER_USER CANNOT describe secrets, should see forbidden error"
 oc get secret vault-secret-example -n $USER_NS --as $USER_USER
