@@ -1,0 +1,57 @@
+# Pod that correctly mounts the ESO-managed secret
+# This pod should start successfully and events will show normal scheduling/mount activity
+apiVersion: v1
+kind: Pod
+metadata:
+  name: demo-app-success
+  namespace: demo-namespace-user
+spec:
+  securityContext:
+    runAsNonRoot: true
+    seccompProfile:
+      type: RuntimeDefault
+  containers:
+  - name: app
+    image: busybox:stable
+    command: ["sleep", "3600"]
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop: ["ALL"]
+    volumeMounts:
+    - name: secret-volume
+      mountPath: "/etc/secret"
+      readOnly: true
+  volumes:
+  - name: secret-volume
+    secret:
+      secretName: vault-secret-example # This secret exists (created by ESO)
+---
+# Pod that references a NON-EXISTENT secret (simulates a typo)
+# This pod will be stuck in ContainerCreating and events will show the mount failure
+apiVersion: v1
+kind: Pod
+metadata:
+  name: demo-app-failure
+  namespace: demo-namespace-user
+spec:
+  securityContext:
+    runAsNonRoot: true
+    seccompProfile:
+      type: RuntimeDefault
+  containers:
+  - name: app
+    image: busybox:stable
+    command: ["sleep", "3600"]
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop: ["ALL"]
+    volumeMounts:
+    - name: secret-volume
+      mountPath: "/etc/secret"
+      readOnly: true
+  volumes:
+  - name: secret-volume
+    secret:
+      secretName: vault-secret-typo # This secret does NOT exist - simulates a typo

@@ -42,6 +42,15 @@ echo ""
 echo "$USER_USER can list events, should see event information"
 oc get events -n $USER_NS --as $USER_USER
 echo ""
+echo "=== EVENTS DEBUGGING DEMO ==="
+echo "Events allow users to diagnose pod issues WITHOUT accessing secrets."
+echo ""
+echo "demo-app-success pod events (should show successful scheduling and mount):"
+oc get events -n $USER_NS --as $USER_USER --field-selector involvedObject.name=demo-app-success
+echo ""
+echo "demo-app-failure pod events (should show mount failure for non-existent secret):"
+oc get events -n $USER_NS --as $USER_USER --field-selector involvedObject.name=demo-app-failure
+echo ""
 echo "$USER_USER CANNOT describe secrets, should see forbidden error"
 oc get secret vault-secret-example -n $USER_NS --as $USER_USER
 oc get secret vault-special-secret-example -n $ADMIN_NS --as $USER_USER

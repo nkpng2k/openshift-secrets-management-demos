@@ -50,6 +50,15 @@ echo "$ADMIN_USER can list events, should see event information"
 oc get events -n $ADMIN_NS --as $ADMIN_USER
 oc get events -n $USER_NS --as $ADMIN_USER
 echo ""
+echo "=== EVENTS DEBUGGING DEMO ==="
+echo "Events allow admins to diagnose pod issues WITHOUT accessing secrets."
+echo ""
+echo "demo-app-success pod events (should show successful scheduling and mount):"
+oc get events -n $USER_NS --as $ADMIN_USER --field-selector involvedObject.name=demo-app-success
+echo ""
+echo "demo-app-failure pod events (should show mount failure for non-existent secret):"
+oc get events -n $USER_NS --as $ADMIN_USER --field-selector involvedObject.name=demo-app-failure
+echo ""
 echo "$ADMIN_USER can list externalsecrets, should see list of externalsecrets"
 oc get externalsecrets -n $ADMIN_NS --as $ADMIN_USER
 oc get externalsecrets -n $USER_NS --as $ADMIN_USER
