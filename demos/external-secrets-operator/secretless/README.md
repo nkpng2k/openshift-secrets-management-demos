@@ -29,6 +29,13 @@ ESO CRD and still have the useful information needed to debug a workload
 while not being permitted to actually inspect the underlying Kubernetes
 Secret.
 
+**Important Note:** Even the Kubernetes `list` verb returns the full Secret
+object data, including base64-encoded values. This means `oc get secrets -o yaml`
+exposes all secret content even without the `get` verb. Therefore, this demo
+removes **all** Secret access from user roles rather than attempting to grant
+limited access. Kubernetes Events are granted instead, providing diagnostic
+information (e.g., mount failures, sync errors) without exposing secret values.
+
 ## Prerequisites
 
 Must have the following installed
@@ -65,8 +72,8 @@ Must have admin credentials for an OpenShift cluster and be logged in via:
 # Deploys the necessary External Secrets Operator CRDs to test access with
 ./04_deploy_eso_crds.sh
 
-# Validates that the created and configured users CANNOT access the Secrets managed
-# by ESO and that only the `demo_admin` user can access the ESO CRDs
+# Validates that neither user has ANY access to Kubernetes Secrets, and that
+# only the `demo_admin` user can access the ESO CRDs for debugging
 ./05_validate_admin_permissions.sh
 ./06_validate_user_permissions.sh
 
@@ -83,9 +90,7 @@ via the OpenShift Console. To do this:
 1. Log into the OpenShift Console with the appropriate user credentials
 2. Select the `Workloads` tab on the left-hand tool bar
 3. Select the `Secrets` option in the `Workloads` dropdown menu
-  - Verfiy that the user can see a list of secrets
-  ![Success List Secret](images/success_list_secret.png)
-  - Verify that when you click on a specific secret, you get a permissions error
+  - Verify that the user CANNOT see any secrets (should see a permissions error)
   ![Forbidden Describe Secret](images/forbidden_describe_secret.png)
 4. As the `demo_admin` user, select the `Ecosystem` tab and select `Installed Operators`. You might need to select a specific project first.
   - Verify that you can see the installed External Secrets Operator
