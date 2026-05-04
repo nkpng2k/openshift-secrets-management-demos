@@ -100,7 +100,7 @@ All nodes should show `Ready` and the cluster version should show
    certificate, and the server trusts the client's certificate
 
 ### Automatic Rotation
-1. The intermediate CA has a short duration (5m) with early renewal (2m before expiry)
+1. The intermediate CA has a short duration (1h10m) with early renewal (1h before expiry)
 2. When cert-manager renews the intermediate CA, the secret is updated with new certificate data
 3. trust-manager detects the secret change and automatically updates the
    trust bundle ConfigMap in all target namespaces
@@ -124,7 +124,7 @@ All nodes should show `Ready` and the cluster version should show
 - Verify trust bundle is mounted: `oc exec <client-pod> -- cat /etc/trust/ca-bundle.crt | head`
 
 ### Rotation timing
-- The intermediate CA renews ~3 minutes after creation (renewBefore: 2m of 5m duration)
+- The intermediate CA renews ~10 minutes after creation (renewBefore: 1h of 1h10m duration)
 - Check certificate status: `oc get certificate intermediate-ca -n trust-manager-demo-ns -o yaml`
 - After rotation, nginx may need a restart to pick up the new server cert:
   `oc rollout restart deployment/mtls-server -n trust-manager-demo-ns`

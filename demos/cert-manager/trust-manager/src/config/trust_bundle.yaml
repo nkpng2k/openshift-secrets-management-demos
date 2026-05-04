@@ -6,11 +6,9 @@ spec:
   sources:
     - secret:
         name: intermediate-ca-secret
-        namespace: DEMO_NS
         key: "tls.crt"
     - secret:
         name: root-ca-secret
-        namespace: DEMO_NS
         key: "ca.crt"
     - useDefaultCAs: true
   target:

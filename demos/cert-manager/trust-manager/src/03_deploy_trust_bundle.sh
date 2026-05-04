@@ -27,12 +27,17 @@ oc new-project $CONSUMER_NS
 oc label namespace $DEMO_NS trust-manager-demo=true --overwrite
 oc label namespace $CONSUMER_NS trust-manager-demo=true --overwrite
 
-# Substitute placeholders and apply trust bundle
-sed \
-  -e "s|DEMO_NS|$DEMO_NS|g" \
-  $SCRIPT_DIR/config/trust_bundle.yaml > $SCRIPT_DIR/config/tmp_trust_bundle.yaml
+TRUST_NS="cert-manager"
 
-oc apply -f $SCRIPT_DIR/config/tmp_trust_bundle.yaml
+# Copy CA secrets to the trust-manager trustNamespace (cert-manager).
+# The Bundle's secret sources look in the trustNamespace by default.
+for SECRET in intermediate-ca-secret root-ca-secret; do
+  oc get secret $SECRET -n $DEMO_NS -o yaml \
+    | sed "s/namespace: $DEMO_NS/namespace: $TRUST_NS/" \
+    | oc apply -n $TRUST_NS -f -
+done
+
+oc apply -f $SCRIPT_DIR/config/trust_bundle.yaml
 
 # Wait for the trust bundle ConfigMap to appear in both namespaces
 echo "Waiting for trust bundle ConfigMap distribution..."

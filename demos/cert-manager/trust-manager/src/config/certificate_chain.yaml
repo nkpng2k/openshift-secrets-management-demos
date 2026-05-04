@@ -50,8 +50,8 @@ metadata:
   namespace: DEMO_NS
 spec:
   isCA: true
-  duration: 5m
-  renewBefore: 2m
+  duration: 1h10m
+  renewBefore: 1h
   commonName: trust-manager-demo-intermediate-ca
   subject:
     organizations:
@@ -86,8 +86,8 @@ metadata:
 spec:
   secretName: server-tls
   isCA: false
-  duration: 1h
-  renewBefore: 30m
+  duration: 2h
+  renewBefore: 1h
   usages:
     - server auth
     - digital signature
@@ -108,8 +108,8 @@ metadata:
 spec:
   secretName: client-tls
   isCA: false
-  duration: 1h
-  renewBefore: 30m
+  duration: 2h
+  renewBefore: 1h
   usages:
     - client auth
     - digital signature

@@ -11,7 +11,7 @@ CONSUMER_NS="trust-manager-consumer-ns"
 echo "=== Trust Bundle Rotation Demo ==="
 echo ""
 echo "This demo waits for cert-manager to naturally renew the intermediate CA"
-echo "certificate (duration: 5m, renewBefore: 2m) and shows that trust-manager"
+echo "certificate (duration: 1h10m, renewBefore: 1h) and shows that trust-manager"
 echo "automatically updates the trust bundle ConfigMap in all target namespaces."
 echo ""
 
