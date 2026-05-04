@@ -23,29 +23,45 @@ oc apply -f $SCRIPT_DIR/config/tmp_acme_example.yaml
 # Wait for deployment to be ready
 wait_spinner 15
 
-# Wait for ACME certificate to be issued (HTTP-01 challenge may take 1-2 minutes)
+# Poll for certificate readiness while capturing Challenge details
 echo "Waiting for ACME certificate to be issued..."
-oc wait --for=condition=Ready certificate/acme-certificate -n cert-manager-acme-ns --timeout=120s
+CHALLENGE_CAPTURED=false
+TIMEOUT=120
+ELAPSED=0
+
+while [[ $ELAPSED -lt $TIMEOUT ]]; do
+  CERT_READY=$(oc get certificate/acme-certificate -n cert-manager-acme-ns -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}' 2>/dev/null)
+
+  if [[ "$CERT_READY" == "True" ]]; then
+    echo "Certificate is ready."
+    break
+  fi
+
+  # Capture Challenge details while they still exist
+  if [[ "$CHALLENGE_CAPTURED" == "false" ]]; then
+    CHALLENGES=$(oc get challenge -n cert-manager-acme-ns --no-headers 2>/dev/null)
+    if [[ -n "$CHALLENGES" ]]; then
+      echo ""
+      echo "--- ACME Challenge detected ---"
+      oc get challenge -n cert-manager-acme-ns
+      echo ""
+      oc describe challenge -n cert-manager-acme-ns > $SCRIPT_DIR/config/tmp_challenge_details.txt
+      oc get events -n cert-manager-acme-ns --field-selector reason=Started --sort-by='.lastTimestamp' > $SCRIPT_DIR/config/tmp_challenge_events.txt 2>/dev/null
+      CHALLENGE_CAPTURED=true
+      echo "Challenge details saved."
+    fi
+  fi
+
+  sleep 5
+  ELAPSED=$((ELAPSED + 5))
+done
+
+if [[ $ELAPSED -ge $TIMEOUT ]]; then
+  echo "ERROR: Timed out waiting for certificate to be ready."
+  oc describe certificate acme-certificate -n cert-manager-acme-ns
+  exit 1
+fi
 
 echo ""
 echo "Certificate status:"
 oc get certificate -n cert-manager-acme-ns
-
-# Wait for the router to reload with the new certificate
-wait_spinner 10
-
-echo ""
-echo "--- Verification ---"
-if [[ "$ACME_ISSUER" == "letsencrypt-production" ]]; then
-  # Production certs are trusted by default
-  echo "Testing with production certificate (trusted by default):"
-  curl -v https://$HOST
-else
-  # Staging certs are NOT trusted; use -k to skip verification
-  echo "Testing with staging certificate (not publicly trusted, using -k):"
-  curl -k -v https://$HOST
-fi
-
-echo ""
-echo "You can also verify the certificate chain with openssl:"
-echo "  openssl s_client -connect $HOST:443 -servername $HOST < /dev/null 2>/dev/null | openssl x509 -noout -issuer -subject -dates"

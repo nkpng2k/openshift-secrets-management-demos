@@ -50,11 +50,15 @@ export ACME_EMAIL=you@example.com
 ./02_deploy_acme_issuers.sh
 
 # Deploys a sample deployment, service, ingress, and certificate
-# Waits for certificate issuance and verifies TLS
+# Waits for certificate issuance, captures ACME Challenge details
 ./03_deploy_example_application.sh
 
+# Validates the ACME flow: Certificate, CertificateRequest, Order,
+# Challenge details, TLS secret, and HTTPS connectivity
+./04_validate.sh
+
 # Cleanup step. Tears down the resources created during the prior steps
-./04_cleanup.sh
+./05_cleanup.sh
 ```
 
 ## Using Staging Certificates
