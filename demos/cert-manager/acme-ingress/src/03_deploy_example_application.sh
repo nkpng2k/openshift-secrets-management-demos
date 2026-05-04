@@ -31,6 +31,9 @@ echo ""
 echo "Certificate status:"
 oc get certificate -n cert-manager-acme-ns
 
+# Wait for the router to reload with the new certificate
+wait_spinner 10
+
 echo ""
 echo "--- Verification ---"
 if [[ "$ACME_ISSUER" == "letsencrypt-production" ]]; then
