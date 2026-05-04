@@ -11,8 +11,8 @@ BASE_DOMAIN=$(oc get dns/cluster -o=jsonpath='{.spec.baseDomain}')
 APP_PREFIX=hello-openshift-acme
 HOST=${APP_PREFIX}.apps.${BASE_DOMAIN}
 
-# Default to staging issuer; set ACME_ISSUER=letsencrypt-production to use production
-ACME_ISSUER=${ACME_ISSUER:-letsencrypt-staging}
+# Default to production issuer; set ACME_ISSUER=letsencrypt-staging for testing
+ACME_ISSUER=${ACME_ISSUER:-letsencrypt-production}
 
 sed \
   -e "s|DNS_HOST|$HOST|g" \

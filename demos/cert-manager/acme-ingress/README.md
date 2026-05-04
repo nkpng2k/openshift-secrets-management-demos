@@ -7,8 +7,9 @@ Ingress secured with a certificate issued by Let's Encrypt.
 
 Unlike the self-signed demos in this repository, this demo
 produces certificates from a real Certificate Authority. The
-demo includes both a Let's Encrypt **staging** Issuer (for safe
-testing) and a **production** Issuer (for trusted certificates).
+demo deploys a Let's Encrypt **production** Issuer by default
+(for trusted certificates), or a **staging** Issuer for safe
+testing.
 
 ## Prerequisites
 
@@ -28,7 +29,7 @@ Additionally, the following conditions must be met:
 | Variable | Required | Default | Description |
 |---|---|---|---|
 | `ACME_EMAIL` | Yes | - | Email address for Let's Encrypt registration |
-| `ACME_ISSUER` | No | `letsencrypt-staging` | Issuer to use (`letsencrypt-staging` or `letsencrypt-production`) |
+| `ACME_ISSUER` | No | `letsencrypt-production` | Issuer to use (`letsencrypt-production` or `letsencrypt-staging`) |
 | `INGRESS_CLASS` | No | `openshift-default` | IngressClass name for the HTTP-01 solver |
 
 ## Steps
@@ -45,10 +46,10 @@ export ACME_EMAIL=you@example.com
 # Installs cert-manager operator
 ./01_install_cert_manager_operator.sh
 
-# Creates Let's Encrypt ACME Issuers (staging + production) and requests a Certificate
+# Creates a Let's Encrypt ACME Issuer (production by default)
 ./02_deploy_acme_issuers.sh
 
-# Deploys a sample deployment, service, and ingress
+# Deploys a sample deployment, service, ingress, and certificate
 # Waits for certificate issuance and verifies TLS
 ./03_deploy_example_application.sh
 
@@ -56,20 +57,25 @@ export ACME_EMAIL=you@example.com
 ./04_cleanup.sh
 ```
 
-## Using Production Certificates
+## Using Staging Certificates
 
-By default, the demo uses the Let's Encrypt **staging** environment,
-which issues certificates that are **not** publicly trusted but has
-generous rate limits. To use production certificates:
+By default, the demo uses the Let's Encrypt **production** environment,
+which issues publicly trusted certificates. To use the staging
+environment instead (useful for repeated testing without hitting
+rate limits):
 
 ```sh
-export ACME_ISSUER=letsencrypt-production
+export ACME_ISSUER=letsencrypt-staging
 ```
+
+**Note:** Staging certificates are **not** publicly trusted. The
+demo will automatically use `curl -k` to skip TLS verification
+when using staging.
 
 **Warning:** Let's Encrypt production has strict
 [rate limits](https://letsencrypt.org/docs/rate-limits/)
 (50 certificates per registered domain per week). Use staging
-for testing.
+for repeated testing.
 
 ## How It Works
 
