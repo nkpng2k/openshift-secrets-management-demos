@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mtls-client
+  namespace: DEMO_NS
+spec:
+  selector:
+    matchLabels:
+      app: mtls-client
+  template:
+    metadata:
+      labels:
+        app: mtls-client
+    spec:
+      containers:
+      - name: client
+        image: registry.access.redhat.com/ubi9/ubi:latest
+        command: ["sleep", "infinity"]
+        volumeMounts:
+        - name: client-tls
+          mountPath: /etc/client-tls
+          readOnly: true
+        - name: trust-bundle
+          mountPath: /etc/trust
+          readOnly: true
+        - name: validation-script
+          mountPath: /scripts
+          readOnly: true
+        resources: {}
+      volumes:
+      - name: client-tls
+        secret:
+          secretName: client-tls
+      - name: trust-bundle
+        configMap:
+          name: demo-trust-bundle
+      - name: validation-script
+        configMap:
+          name: mtls-validation-script
+          defaultMode: 0755

@@ -1,0 +1,21 @@
+apiVersion: trust.cert-manager.io/v1alpha1
+kind: Bundle
+metadata:
+  name: demo-trust-bundle
+spec:
+  sources:
+    - secret:
+        name: intermediate-ca-secret
+        namespace: DEMO_NS
+        key: "tls.crt"
+    - secret:
+        name: root-ca-secret
+        namespace: DEMO_NS
+        key: "ca.crt"
+    - useDefaultCAs: true
+  target:
+    configMap:
+      key: "ca-bundle.crt"
+    namespaceSelector:
+      matchLabels:
+        trust-manager-demo: "true"

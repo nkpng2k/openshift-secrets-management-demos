@@ -1,0 +1,81 @@
+# nginx configuration for mTLS
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mtls-server-config
+  namespace: DEMO_NS
+data:
+  default.conf: |
+    server {
+        listen 8443 ssl;
+        server_name DNS_HOST;
+
+        ssl_certificate /etc/nginx/ssl/tls.crt;
+        ssl_certificate_key /etc/nginx/ssl/tls.key;
+
+        ssl_client_certificate /etc/nginx/trust/ca-bundle.crt;
+        ssl_verify_client on;
+
+        ssl_protocols TLSv1.2 TLSv1.3;
+
+        location / {
+            return 200 'Hello mTLS!\n';
+            add_header Content-Type text/plain;
+        }
+    }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mtls-server
+  namespace: DEMO_NS
+spec:
+  selector:
+    matchLabels:
+      app: mtls-server
+  template:
+    metadata:
+      labels:
+        app: mtls-server
+    spec:
+      containers:
+      - name: nginx
+        image: registry.access.redhat.com/ubi9/nginx-124:latest
+        ports:
+        - containerPort: 8443
+          protocol: TCP
+        volumeMounts:
+        - name: server-tls
+          mountPath: /etc/nginx/ssl
+          readOnly: true
+        - name: trust-bundle
+          mountPath: /etc/nginx/trust
+          readOnly: true
+        - name: nginx-config
+          mountPath: /etc/nginx/conf.d
+          readOnly: true
+        resources: {}
+      volumes:
+      - name: server-tls
+        secret:
+          secretName: server-tls
+      - name: trust-bundle
+        configMap:
+          name: demo-trust-bundle
+      - name: nginx-config
+        configMap:
+          name: mtls-server-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mtls-server
+  namespace: DEMO_NS
+spec:
+  selector:
+    app: mtls-server
+  ports:
+  - name: https
+    port: 443
+    protocol: TCP
+    targetPort: 8443

@@ -1,0 +1,121 @@
+# Step 1: SelfSigned Issuer (bootstraps the root CA)
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: selfsigned-issuer
+  namespace: DEMO_NS
+spec:
+  selfSigned: {}
+---
+# Step 2: Root CA Certificate
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: root-ca
+  namespace: DEMO_NS
+spec:
+  isCA: true
+  duration: 8760h
+  renewBefore: 720h
+  commonName: trust-manager-demo-root-ca
+  subject:
+    organizations:
+      - Demo Inc.
+    organizationalUnits:
+      - Root CA
+  secretName: root-ca-secret
+  privateKey:
+    algorithm: ECDSA
+    size: 256
+  issuerRef:
+    name: selfsigned-issuer
+    kind: Issuer
+    group: cert-manager.io
+---
+# Step 3: CA Issuer backed by Root CA (issues intermediate certificates)
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: root-ca-issuer
+  namespace: DEMO_NS
+spec:
+  ca:
+    secretName: root-ca-secret
+---
+# Step 4: Intermediate CA Certificate (short-lived for rotation demo)
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: intermediate-ca
+  namespace: DEMO_NS
+spec:
+  isCA: true
+  duration: 5m
+  renewBefore: 2m
+  commonName: trust-manager-demo-intermediate-ca
+  subject:
+    organizations:
+      - Demo Inc.
+    organizationalUnits:
+      - Intermediate CA
+  secretName: intermediate-ca-secret
+  privateKey:
+    algorithm: ECDSA
+    size: 256
+  issuerRef:
+    name: root-ca-issuer
+    kind: Issuer
+    group: cert-manager.io
+---
+# Step 5: CA Issuer backed by Intermediate CA (issues leaf certificates)
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: intermediate-ca-issuer
+  namespace: DEMO_NS
+spec:
+  ca:
+    secretName: intermediate-ca-secret
+---
+# Step 6: Server leaf certificate (for the mTLS server)
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: server-cert
+  namespace: DEMO_NS
+spec:
+  secretName: server-tls
+  isCA: false
+  duration: 1h
+  renewBefore: 30m
+  usages:
+    - server auth
+    - digital signature
+  dnsNames:
+    - DNS_HOST
+    - SVC_HOST
+  issuerRef:
+    name: intermediate-ca-issuer
+    kind: Issuer
+    group: cert-manager.io
+---
+# Step 7: Client leaf certificate (for the mTLS client)
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: client-cert
+  namespace: DEMO_NS
+spec:
+  secretName: client-tls
+  isCA: false
+  duration: 1h
+  renewBefore: 30m
+  usages:
+    - client auth
+    - digital signature
+  dnsNames:
+    - mtls-client.DEMO_NS.svc.cluster.local
+  issuerRef:
+    name: intermediate-ca-issuer
+    kind: Issuer
+    group: cert-manager.io
