@@ -23,19 +23,9 @@ echo "Bundle CRD found."
 # Create consumer namespace to demonstrate cross-namespace distribution
 oc new-project $CONSUMER_NS
 
-# Label both namespaces for the trust bundle selector
-oc label namespace $DEMO_NS trust-manager-demo=true --overwrite
-oc label namespace $CONSUMER_NS trust-manager-demo=true --overwrite
-
-TRUST_NS="cert-manager"
-
-# Copy CA secrets to the trust-manager trustNamespace (cert-manager).
-# The Bundle's secret sources look in the trustNamespace by default.
-for SECRET in intermediate-ca-secret root-ca-secret; do
-  oc get secret $SECRET -n $DEMO_NS -o yaml \
-    | sed "s/namespace: $DEMO_NS/namespace: $TRUST_NS/" \
-    | oc apply -n $TRUST_NS -f -
-done
+# Label both namespaces for trust bundle injection
+oc label namespace $DEMO_NS trust.cert-manager.io/inject=true --overwrite
+oc label namespace $CONSUMER_NS trust.cert-manager.io/inject=true --overwrite
 
 oc apply -f $SCRIPT_DIR/config/trust_bundle.yaml
 

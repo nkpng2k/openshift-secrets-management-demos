@@ -10,6 +10,10 @@ spec:
     filterExpiredCertificates: "Enabled"
     defaultCAPackage:
       policy: "Enabled"
+    secretTargets:
+      policy: "Custom"
+      authorizedSecrets:
+        - "demo-trust-bundle"
     resources: {}
     affinity: {}
     tolerations: []
