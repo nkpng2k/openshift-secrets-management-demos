@@ -3,7 +3,7 @@
 # mTLS validation script - runs inside the client pod
 # Uses mounted certificates and trust bundle to validate the chain of trust
 
-SERVER_URL="https://mtls-server.DEMO_NS.svc.cluster.local"
+SERVER_URL="https://mtls-server.SERVER_NS.svc.cluster.local"
 CLIENT_CERT="/etc/client-tls/tls.crt"
 CLIENT_KEY="/etc/client-tls/tls.key"
 CA_BUNDLE="/etc/trust/ca-bundle.crt"
@@ -84,8 +84,8 @@ echo | openssl s_client \
   -cert "$CLIENT_CERT" \
   -key "$CLIENT_KEY" \
   -CAfile "$CA_BUNDLE" \
-  -connect mtls-server.DEMO_NS.svc.cluster.local:443 \
-  -servername mtls-server.DEMO_NS.svc.cluster.local \
+  -connect mtls-server.SERVER_NS.svc.cluster.local:443 \
+  -servername mtls-server.SERVER_NS.svc.cluster.local \
   2>/dev/null | openssl x509 -noout -issuer -subject -dates 2>/dev/null
 
 echo ""

@@ -7,16 +7,12 @@ spec:
     - secret:
         name: intermediate-ca-secret
         key: "tls.crt"
-        namespace: "trust-manager-demo-ns"
     - secret:
         name: root-ca-secret
         key: "ca.crt"
-        namespace: "trust-manager-demo-ns"
     - useDefaultCAs: true
   target:
     configMap:
-      key: "ca-bundle.crt"
-    secret:
       key: "ca-bundle.crt"
     namespaceSelector:
       matchLabels:

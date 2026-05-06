@@ -3,7 +3,7 @@ apiVersion: cert-manager.io/v1
 kind: Issuer
 metadata:
   name: selfsigned-issuer
-  namespace: DEMO_NS
+  namespace: CA_NS
 spec:
   selfSigned: {}
 ---
@@ -12,7 +12,7 @@ apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: root-ca
-  namespace: DEMO_NS
+  namespace: CA_NS
 spec:
   isCA: true
   duration: 8760h
@@ -37,7 +37,7 @@ apiVersion: cert-manager.io/v1
 kind: Issuer
 metadata:
   name: root-ca-issuer
-  namespace: DEMO_NS
+  namespace: CA_NS
 spec:
   ca:
     secretName: root-ca-secret
@@ -47,7 +47,7 @@ apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: intermediate-ca
-  namespace: DEMO_NS
+  namespace: CA_NS
 spec:
   isCA: true
   duration: 1h10m
@@ -67,22 +67,23 @@ spec:
     kind: Issuer
     group: cert-manager.io
 ---
-# Step 5: CA Issuer backed by Intermediate CA (issues leaf certificates)
+# Step 5: ClusterIssuer backed by Intermediate CA (issues leaf certificates
+# across namespaces). cert-manager resolves the CA secret from its own
+# namespace (cert-manager on OCP).
 apiVersion: cert-manager.io/v1
-kind: Issuer
+kind: ClusterIssuer
 metadata:
-  name: intermediate-ca-issuer
-  namespace: DEMO_NS
+  name: intermediate-ca-cluster-issuer
 spec:
   ca:
     secretName: intermediate-ca-secret
 ---
-# Step 6: Server leaf certificate (for the mTLS server)
+# Step 6: Server leaf certificate (issued in the server namespace)
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: server-cert
-  namespace: DEMO_NS
+  namespace: SERVER_NS
 spec:
   secretName: server-tls
   isCA: false
@@ -95,16 +96,16 @@ spec:
     - DNS_HOST
     - SVC_HOST
   issuerRef:
-    name: intermediate-ca-issuer
-    kind: Issuer
+    name: intermediate-ca-cluster-issuer
+    kind: ClusterIssuer
     group: cert-manager.io
 ---
-# Step 7: Client leaf certificate (for the mTLS client)
+# Step 7: Client leaf certificate (issued in the client namespace)
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: client-cert
-  namespace: DEMO_NS
+  namespace: CLIENT_NS
 spec:
   secretName: client-tls
   isCA: false
@@ -114,8 +115,8 @@ spec:
     - client auth
     - digital signature
   dnsNames:
-    - mtls-client.DEMO_NS.svc.cluster.local
+    - mtls-client.CLIENT_NS.svc.cluster.local
   issuerRef:
-    name: intermediate-ca-issuer
-    kind: Issuer
+    name: intermediate-ca-cluster-issuer
+    kind: ClusterIssuer
     group: cert-manager.io

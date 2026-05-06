@@ -5,8 +5,8 @@ DEMO_SRC_DIR="cert-manager/trust-manager/src"
 UTILS_DIR=$(sed "s|$DEMO_SRC_DIR|utils|g" <<< "$SCRIPT_DIR")
 source $UTILS_DIR/ocp.sh
 
-DEMO_NS="trust-manager-demo-ns"
-CONSUMER_NS="trust-manager-consumer-ns"
+SERVER_NS="trust-manager-server-ns"
+CLIENT_NS="trust-manager-client-ns"
 
 # Verify the Bundle CRD exists (trust-manager is running)
 echo "Verifying trust-manager is available..."
@@ -20,18 +20,15 @@ if ! oc get crd bundles.trust.cert-manager.io &>/dev/null; then
 fi
 echo "Bundle CRD found."
 
-# Create consumer namespace to demonstrate cross-namespace distribution
-oc new-project $CONSUMER_NS
-
-# Label both namespaces for trust bundle injection
-oc label namespace $DEMO_NS trust.cert-manager.io/inject=true --overwrite
-oc label namespace $CONSUMER_NS trust.cert-manager.io/inject=true --overwrite
+# Label workload namespaces for trust bundle injection
+oc label namespace $SERVER_NS trust.cert-manager.io/inject=true --overwrite
+oc label namespace $CLIENT_NS trust.cert-manager.io/inject=true --overwrite
 
 oc apply -f $SCRIPT_DIR/config/trust_bundle.yaml
 
 # Wait for the trust bundle ConfigMap to appear in both namespaces
 echo "Waiting for trust bundle ConfigMap distribution..."
-for NS in $DEMO_NS $CONSUMER_NS; do
+for NS in $SERVER_NS $CLIENT_NS; do
   TIMEOUT=60
   ELAPSED=0
   while ! oc get configmap demo-trust-bundle -n $NS &>/dev/null; do
@@ -50,7 +47,7 @@ echo ""
 echo "Trust bundle distributed successfully."
 echo ""
 echo "Trust bundle contents (number of PEM certificates):"
-CERT_COUNT=$(oc get configmap demo-trust-bundle -n $DEMO_NS -o jsonpath='{.data.ca-bundle\.crt}' | grep -c "BEGIN CERTIFICATE")
+CERT_COUNT=$(oc get configmap demo-trust-bundle -n $SERVER_NS -o jsonpath='{.data.ca-bundle\.crt}' | grep -c "BEGIN CERTIFICATE")
 echo "  $CERT_COUNT certificates in trust bundle"
 echo ""
 echo "Bundle status:"

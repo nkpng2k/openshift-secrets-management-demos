@@ -3,7 +3,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: mtls-server-config
-  namespace: DEMO_NS
+  namespace: SERVER_NS
 data:
   default.conf: |
     server {
@@ -28,7 +28,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: mtls-server
-  namespace: DEMO_NS
+  namespace: SERVER_NS
 spec:
   selector:
     matchLabels:
@@ -70,7 +70,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: mtls-server
-  namespace: DEMO_NS
+  namespace: SERVER_NS
 spec:
   selector:
     app: mtls-server

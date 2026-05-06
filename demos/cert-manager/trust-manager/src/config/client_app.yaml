@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: mtls-client
-  namespace: DEMO_NS
+  namespace: CLIENT_NS
 spec:
   selector:
     matchLabels:
