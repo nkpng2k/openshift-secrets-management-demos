@@ -1,0 +1,16 @@
+apiVersion: operator.openshift.io/v1alpha1
+kind: TrustManager
+metadata:
+  name: cluster
+spec:
+  trustManagerConfig:
+    logLevel: 2
+    logFormat: "text"
+    trustNamespace: "cert-manager"
+    filterExpiredCertificates: "Enabled"
+    defaultCAPackage:
+      policy: "Enabled"
+    resources: {}
+    affinity: {}
+    tolerations: []
+    nodeSelector: {}
