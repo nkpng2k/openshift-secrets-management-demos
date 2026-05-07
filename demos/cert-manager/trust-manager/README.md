@@ -23,44 +23,44 @@ cert-manager operator for OpenShift 4.21 (cert-manager 1.19).
 ## Architecture
 
 ```
-┌─── cert-manager namespace (trustNamespace) ──────────────────────────────┐
-│                                                                          │
-│  SelfSigned Issuer ──issues──▶ Root CA Certificate ──▶ root-ca-secret    │
-│                                      │                       │           │
-│                                      ▼                       │           │
-│                              Root CA Issuer                   │           │
-│                                      │                       │           │
-│                                      ▼                       │           │
-│                        Intermediate CA Certificate            │           │
-│                                      │                       │           │
-│                                      ▼                       │           │
-│                          intermediate-ca-secret               │           │
-│                                      │                       │           │
-└──────────────────────────────────────┼───────────────────────┼───────────┘
-                                       │                       │
-              ┌────────────────────────┘                       │
-              ▼                                                │
-   ClusterIssuer                                               │
-   (intermediate-ca-cluster-issuer)                            │
-              │                                                │
-              ├──────────────────────┐                         │
-              ▼                      ▼                         ▼
-┌─── trust-manager-server-ns ──┐  ┌─── trust-manager-client-ns ──┐
-│                               │  │                               │
-│  Server Certificate           │  │  Client Certificate           │
-│       ▼                       │  │       ▼                       │
-│  server-tls secret            │  │  client-tls secret            │
-│                               │  │                               │
-│  nginx Deployment ◀── mTLS ──┼──┼── Client Deployment           │
-│       ▲                       │  │       ▲                       │
-│       │                       │  │       │                       │
-│  demo-trust-bundle ConfigMap  │  │  demo-trust-bundle ConfigMap  │
-│       ▲                       │  │       ▲                       │
-└───────┼───────────────────────┘  └───────┼───────────────────────┘
-        │                                  │
-        └──────────┐    ┌──────────────────┘
-                   │    │
-              trust-manager
+┌─── cert-manager namespace (trustNamespace) ────────────────────────────┐
+│                                                                        │
+│  SelfSigned Issuer ──issues──▶ Root CA Certificate ──▶ root-ca-secret ─┼──┐
+│                                      │                                 │  │
+│                                      ▼                                 │  │
+│                              Root CA Issuer                            │  │
+│                                      │                                 │  │
+│                                      ▼                                 │  │
+│                        Intermediate CA Certificate                     │  │
+│                                      │                                 │  │
+│                                      ▼                                 │  │
+│                          intermediate-ca-secret ───────────────────────┼──┤
+│                                      │                                 │  │
+└──────────────────────────────────────┼─────────────────────────────────┘  │
+                                       │                                    │
+              ┌────────────────────────┘                                    │
+              ▼                                                             │
+   ClusterIssuer                                                            │
+   (intermediate-ca-cluster-issuer)                                         │
+              │                                                             │
+              ├──────────────────────┐                                      │
+              ▼                      ▼                                      │
+┌─── trust-manager-server-ns ──┐  ┌─── trust-manager-client-ns ──┐          │
+│                              │  │                              │          │
+│  Server Certificate          │  │  Client Certificate          │          │
+│       ▼                      │  │       ▼                      │          │
+│  server-tls secret           │  │  client-tls secret           │          │
+│                              │  │                              │          │
+│  nginx Deployment ◀── mTLS ──┼──┼── Client Deployment          │          │
+│       ▲                      │  │       ▲                      │          │
+│       │                      │  │       │                      │          │
+│  demo-trust-bundle ConfigMap │  │  demo-trust-bundle ConfigMap │          │
+│       ▲                      │  │       ▲                      │          │
+└───────┼──────────────────────┘  └───────┼──────────────────────┘          │
+        │                                 │                                 │
+        └──────────┐    ┌─────────────────┘                                 │
+                   │    │                                                   │
+              trust-manager ◀───────────────────────────────────────────────┘
            (Bundle distribution)
 ```
 
