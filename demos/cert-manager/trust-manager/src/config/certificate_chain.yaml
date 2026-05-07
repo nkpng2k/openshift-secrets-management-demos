@@ -42,7 +42,7 @@ spec:
   ca:
     secretName: root-ca-secret
 ---
-# Step 4: Intermediate CA Certificate (short-lived for rotation demo)
+# Step 4: Intermediate CA Certificate
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
@@ -50,8 +50,8 @@ metadata:
   namespace: CA_NS
 spec:
   isCA: true
-  duration: 1h10m
-  renewBefore: 1h
+  duration: 2h
+  renewBefore: 30m
   commonName: trust-manager-demo-intermediate-ca
   subject:
     organizations:
@@ -87,8 +87,8 @@ metadata:
 spec:
   secretName: server-tls
   isCA: false
-  duration: 2h
-  renewBefore: 1h
+  duration: 1h
+  renewBefore: 50m
   usages:
     - server auth
     - digital signature
@@ -109,8 +109,8 @@ metadata:
 spec:
   secretName: client-tls
   isCA: false
-  duration: 2h
-  renewBefore: 1h
+  duration: 1h
+  renewBefore: 50m
   usages:
     - client auth
     - digital signature

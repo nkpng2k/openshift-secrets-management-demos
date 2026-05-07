@@ -58,12 +58,12 @@ done
 echo ""
 echo "Waiting for leaf certificates to be issued..."
 
-declare -A LEAF_CERTS
-LEAF_CERTS[server-cert]=$SERVER_NS
-LEAF_CERTS[client-cert]=$CLIENT_NS
+LEAF_CERT_NAMES=("server-cert" "client-cert")
+LEAF_CERT_NSS=("$SERVER_NS" "$CLIENT_NS")
 
-for CERT in "${!LEAF_CERTS[@]}"; do
-  NS=${LEAF_CERTS[$CERT]}
+for i in 0 1; do
+  CERT=${LEAF_CERT_NAMES[$i]}
+  NS=${LEAF_CERT_NSS[$i]}
   echo "Checking certificate: $CERT (namespace: $NS)"
   READY=$(oc get certificate $CERT -n $NS -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}' 2>/dev/null)
   TIMEOUT=60

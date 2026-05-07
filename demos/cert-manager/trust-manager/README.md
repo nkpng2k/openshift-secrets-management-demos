@@ -120,8 +120,8 @@ All nodes should show `Ready` and the cluster version should show
 # Validates the full chain of trust (certificate chain, trust bundle, mTLS)
 ./05_validate_chain_of_trust.sh
 
-# Demonstrates automatic trust bundle rotation when the intermediate CA renews
-# NOTE: This script waits for natural certificate renewal (~5 minutes)
+# Triggers an intermediate CA key rotation and demonstrates that trust-manager
+# updates the bundle and cert-manager re-issues leaf certs automatically
 ./06_demo_trust_bundle_rotation.sh
 
 # Cleanup step. Tears down all demo resources (FeatureGate cannot be reverted)
@@ -132,11 +132,11 @@ All nodes should show `Ready` and the cluster version should show
 
 ### Certificate Chain
 1. A self-signed Issuer in the `cert-manager` namespace bootstraps a Root CA
-2. The Root CA issues an Intermediate CA certificate (short-lived: 1h10m
-   duration for the rotation demo)
+2. The Root CA issues an Intermediate CA certificate (duration: 2h)
 3. A **ClusterIssuer** backed by the Intermediate CA allows any namespace to
    request leaf certificates
-4. Two leaf certificates are issued via the ClusterIssuer:
+4. Two short-lived leaf certificates (duration: 1h, renewing every ~10m) are
+   issued via the ClusterIssuer:
    - A **server** certificate (`server auth`) in `trust-manager-server-ns`
    - A **client** certificate (`client auth`) in `trust-manager-client-ns`
 
@@ -157,13 +157,16 @@ All nodes should show `Ready` and the cluster version should show
 3. The trust bundle enables both sides: the client trusts the server's
    certificate, and the server trusts the client's certificate
 
-### Automatic Rotation
-1. The intermediate CA has a short duration (1h10m) with early renewal
-   (1h before expiry)
-2. When cert-manager renews the intermediate CA, the secret is updated
+### Key Rotation
+1. Leaf certificates are short-lived (1h) and renew every ~10 minutes,
+   ensuring they are always fresh relative to the intermediate CA
+2. Script 06 triggers an intermediate CA key rotation by deleting its
+   secret, which causes cert-manager to re-issue with a new key pair
 3. trust-manager detects the secret change and automatically updates the
    trust bundle ConfigMap in all target namespaces
-4. Pods with the ConfigMap volume receive the update via kubelet sync (~60s)
+4. cert-manager re-issues the leaf certificates signed by the new
+   intermediate key at their next renewal cycle
+5. Pods with the ConfigMap volume receive the update via kubelet sync (~60s)
 
 ## Troubleshooting
 
@@ -187,9 +190,10 @@ All nodes should show `Ready` and the cluster version should show
 - Check server logs: `oc logs -n trust-manager-server-ns -l app=mtls-server`
 - Verify trust bundle is mounted: `oc exec <client-pod> -n trust-manager-client-ns -- cat /etc/trust/ca-bundle.crt | head`
 
-### Rotation timing
-- The intermediate CA renews ~10 minutes after creation
-- Check status: `oc get certificate intermediate-ca -n cert-manager -o yaml`
+### Rotation issues
+- Leaf certs renew every ~10 minutes; if script 06 times out, check:
+  `oc get certificate -n trust-manager-server-ns` and
+  `oc get certificate -n trust-manager-client-ns`
 - After rotation, nginx may need a restart to pick up the new trust bundle:
   `oc rollout restart deployment/mtls-server -n trust-manager-server-ns`
 

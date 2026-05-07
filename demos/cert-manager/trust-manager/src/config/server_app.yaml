@@ -41,6 +41,7 @@ spec:
       containers:
       - name: nginx
         image: registry.access.redhat.com/ubi9/nginx-124:latest
+        command: ["nginx", "-g", "daemon off;"]
         ports:
         - containerPort: 8443
           protocol: TCP
@@ -52,7 +53,7 @@ spec:
           mountPath: /etc/nginx/trust
           readOnly: true
         - name: nginx-config
-          mountPath: /etc/nginx/conf.d
+          mountPath: /opt/app-root/etc/nginx.d
           readOnly: true
         resources: {}
       volumes:
