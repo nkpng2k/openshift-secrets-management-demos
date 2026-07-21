@@ -15,8 +15,8 @@ metadata:
   namespace: CA_NS
 spec:
   isCA: true
-  duration: 8760h
-  renewBefore: 720h
+  duration: ROOT_CA_DURATION
+  renewBefore: ROOT_CA_RENEW_BEFORE
   commonName: trust-manager-demo-root-ca
   subject:
     organizations:
@@ -50,8 +50,8 @@ metadata:
   namespace: CA_NS
 spec:
   isCA: true
-  duration: 2h
-  renewBefore: 30m
+  duration: INTERMEDIATE_CA_DURATION
+  renewBefore: INTERMEDIATE_CA_RENEW_BEFORE
   commonName: trust-manager-demo-intermediate-ca
   subject:
     organizations:
@@ -87,8 +87,8 @@ metadata:
 spec:
   secretName: server-tls
   isCA: false
-  duration: 1h
-  renewBefore: 50m
+  duration: LEAF_DURATION
+  renewBefore: LEAF_RENEW_BEFORE
   usages:
     - server auth
     - digital signature
@@ -109,8 +109,8 @@ metadata:
 spec:
   secretName: client-tls
   isCA: false
-  duration: 1h
-  renewBefore: 50m
+  duration: LEAF_DURATION
+  renewBefore: LEAF_RENEW_BEFORE
   usages:
     - client auth
     - digital signature

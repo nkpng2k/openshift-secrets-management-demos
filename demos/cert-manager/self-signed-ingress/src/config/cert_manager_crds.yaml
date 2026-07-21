@@ -12,8 +12,8 @@ metadata:
   name: test-ca-TYPE
   namespace: cert-manager-demo-ns
 spec:
-  duration: 60m
-  renewBefore: 10m
+  duration: CA_DURATION
+  renewBefore: CA_RENEW_BEFORE
   isCA: true
   commonName: test-ca-TYPE
   subject:
@@ -45,8 +45,8 @@ metadata:
   name: test-client-TYPE
   namespace: cert-manager-demo-ns
 spec:
-  duration: 60m
-  renewBefore: 10m
+  duration: LEAF_DURATION
+  renewBefore: LEAF_RENEW_BEFORE
   secretName: test-client-tls-TYPE
   isCA: false
   usages:

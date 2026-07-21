@@ -12,7 +12,12 @@ APP_PREFIX=hello-openshift-ingress
 HOST=${APP_PREFIX}.apps.${BASE_DOMAIN}
 TYPE="ingress"
 
+LEAF_DURATION="${LEAF_DURATION:-60m}"
+LEAF_RENEW_BEFORE="${LEAF_RENEW_BEFORE:-10m}"
+
 sed \
+  -e "s|LEAF_DURATION|$LEAF_DURATION|g" \
+  -e "s|LEAF_RENEW_BEFORE|$LEAF_RENEW_BEFORE|g" \
   -e "s|DNS_HOST|$HOST|g" \
   -e "s|TYPE|$TYPE|g" \
   $SCRIPT_DIR/config/cert_manager_example.yaml > $SCRIPT_DIR/config/tmp_cert_manager_example.yaml
