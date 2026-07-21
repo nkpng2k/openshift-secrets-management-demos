@@ -19,6 +19,11 @@ BASE_DOMAIN=$(oc get dns/cluster -o=jsonpath='{.spec.baseDomain}')
 DNS_HOST=mtls-server.apps.${BASE_DOMAIN}
 SVC_HOST=mtls-server.${VAULT_ISSUER_NS}.svc.cluster.local
 
+INTERMEDIATE_CA_DURATION="${INTERMEDIATE_CA_DURATION:-8h}"
+INTERMEDIATE_CA_RENEW_BEFORE="${INTERMEDIATE_CA_RENEW_BEFORE:-4h}"
+LEAF_DURATION="${LEAF_DURATION:-1h}"
+LEAF_RENEW_BEFORE="${LEAF_RENEW_BEFORE:-50m}"
+
 # --- Deploy the Vault Issuer (SA, token Secret, RBAC, Issuer) ---
 
 sed \
@@ -88,6 +93,10 @@ fi
 # --- Deploy the certificate chain ---
 
 sed \
+  -e "s|INTERMEDIATE_CA_DURATION|$INTERMEDIATE_CA_DURATION|g" \
+  -e "s|INTERMEDIATE_CA_RENEW_BEFORE|$INTERMEDIATE_CA_RENEW_BEFORE|g" \
+  -e "s|LEAF_DURATION|$LEAF_DURATION|g" \
+  -e "s|LEAF_RENEW_BEFORE|$LEAF_RENEW_BEFORE|g" \
   -e "s|VAULT_ISSUER_NS|$VAULT_ISSUER_NS|g" \
   -e "s|DNS_HOST|$DNS_HOST|g" \
   -e "s|SVC_HOST|$SVC_HOST|g" \

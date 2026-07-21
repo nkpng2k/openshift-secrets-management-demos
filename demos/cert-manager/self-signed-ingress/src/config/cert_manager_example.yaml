@@ -45,8 +45,8 @@ kind: Ingress
 metadata:
   annotations:
     cert-manager.io/issuer: test-ca-issuer-TYPE
-    cert-manager.io/duration: 60m
-    cert-manager.io/renewBefore: 10m
+    cert-manager.io/duration: LEAF_DURATION
+    cert-manager.io/renewBefore: LEAF_RENEW_BEFORE
   name: hello-openshift-ingress
 spec:
   rules:
