@@ -60,14 +60,25 @@ APP_PREFIX=hello-openshift-ingress
 HOST=${APP_PREFIX}.apps.${BASE_DOMAIN}
 TYPE="ingress"
 
+CA_DURATION="${CA_DURATION:-60m}"
+CA_RENEW_BEFORE="${CA_RENEW_BEFORE:-10m}"
+LEAF_DURATION="${LEAF_DURATION:-60m}"
+LEAF_RENEW_BEFORE="${LEAF_RENEW_BEFORE:-10m}"
+
 CERT_MANAGER_CONFIG="$DEMOS_DIR/cert-manager/self-signed-ingress/src/config"
 
 sed \
+  -e "s|CA_DURATION|$CA_DURATION|g" \
+  -e "s|CA_RENEW_BEFORE|$CA_RENEW_BEFORE|g" \
+  -e "s|LEAF_DURATION|$LEAF_DURATION|g" \
+  -e "s|LEAF_RENEW_BEFORE|$LEAF_RENEW_BEFORE|g" \
   -e "s|DNS_HOST|$HOST|g" \
   -e "s|TYPE|$TYPE|g" \
   "$CERT_MANAGER_CONFIG/cert_manager_crds.yaml" | oc apply -f -
 
 sed \
+  -e "s|LEAF_DURATION|$LEAF_DURATION|g" \
+  -e "s|LEAF_RENEW_BEFORE|$LEAF_RENEW_BEFORE|g" \
   -e "s|DNS_HOST|$HOST|g" \
   -e "s|TYPE|$TYPE|g" \
   "$CERT_MANAGER_CONFIG/cert_manager_example.yaml" | oc apply -f -
