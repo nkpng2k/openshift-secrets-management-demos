@@ -1,0 +1,106 @@
+# Step 1: Intermediate CA Certificate
+# Issued by the Vault PKI Root CA via the vault-pki-issuer.
+# cert-manager manages renewal automatically.
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: intermediate-ca
+  namespace: VAULT_ISSUER_NS
+spec:
+  isCA: true
+  duration: 8h
+  renewBefore: 4h
+  commonName: Vault PKI Demo Intermediate CA
+  subject:
+    organizations:
+      - Demo Inc.
+    organizationalUnits:
+      - Intermediate CA
+  secretName: intermediate-ca-secret
+  privateKey:
+    algorithm: ECDSA
+    size: 256
+  issuerRef:
+    name: vault-pki-issuer
+    kind: Issuer
+    group: cert-manager.io
+---
+# Step 2: Local CA Issuer backed by the Intermediate CA
+# All leaf certificates are issued by this local Issuer,
+# with no further Vault interaction required.
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: intermediate-ca-issuer
+  namespace: VAULT_ISSUER_NS
+spec:
+  ca:
+    secretName: intermediate-ca-secret
+---
+# Step 3: Server leaf certificate (issued locally by intermediate CA)
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: server-cert
+  namespace: VAULT_ISSUER_NS
+spec:
+  secretName: server-tls
+  isCA: false
+  duration: 1h
+  renewBefore: 50m
+  usages:
+    - server auth
+    - digital signature
+  dnsNames:
+    - DNS_HOST
+    - SVC_HOST
+  issuerRef:
+    name: intermediate-ca-issuer
+    kind: Issuer
+    group: cert-manager.io
+---
+# Step 4: Client leaf certificate (issued locally by intermediate CA)
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: client-cert
+  namespace: VAULT_ISSUER_NS
+spec:
+  secretName: client-tls
+  isCA: false
+  duration: 1h
+  renewBefore: 50m
+  usages:
+    - client auth
+    - digital signature
+  dnsNames:
+    - mtls-client.VAULT_ISSUER_NS.svc.cluster.local
+  issuerRef:
+    name: intermediate-ca-issuer
+    kind: Issuer
+    group: cert-manager.io
+---
+# Step 5: Direct leaf certificate (issued directly by Vault Root CA)
+# Demonstrates that Vault can also issue leaf certs directly,
+# without going through the on-cluster intermediate CA.
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: vault-direct-leaf-cert
+  namespace: VAULT_ISSUER_NS
+spec:
+  secretName: vault-direct-tls
+  isCA: false
+  duration: 1h
+  renewBefore: 50m
+  commonName: vault-direct-leaf.VAULT_ISSUER_NS.svc.cluster.local
+  usages:
+    - server auth
+    - client auth
+    - digital signature
+  dnsNames:
+    - vault-direct-leaf.VAULT_ISSUER_NS.svc.cluster.local
+  issuerRef:
+    name: vault-pki-leaf-issuer
+    kind: Issuer
+    group: cert-manager.io

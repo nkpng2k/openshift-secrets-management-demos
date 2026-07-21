@@ -1,0 +1,73 @@
+# ServiceAccount for cert-manager to authenticate to Vault
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: vault-issuer-sa
+  namespace: VAULT_ISSUER_NS
+---
+# Long-lived SA token Secret for Vault Kubernetes auth.
+# On OpenShift 4.x (Kubernetes 1.24+), auto-created SA tokens are
+# short-lived projected tokens. cert-manager's Vault issuer needs
+# a Secret reference, so we create one explicitly.
+apiVersion: v1
+kind: Secret
+metadata:
+  name: vault-issuer-token
+  namespace: VAULT_ISSUER_NS
+  annotations:
+    kubernetes.io/service-account.name: vault-issuer-sa
+type: kubernetes.io/service-account-token
+---
+# Allow Vault to validate the SA token via the TokenReview API
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: vault-issuer-tokenreview-binding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: system:auth-delegator
+subjects:
+- kind: ServiceAccount
+  name: vault-issuer-sa
+  namespace: VAULT_ISSUER_NS
+---
+# cert-manager Issuer backed by Vault PKI Root CA.
+# Uses pki/root/sign-intermediate so Vault produces CA certificates
+# with CA:TRUE when cert-manager sends isCA: true.
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: vault-pki-issuer
+  namespace: VAULT_ISSUER_NS
+spec:
+  vault:
+    path: pki/root/sign-intermediate
+    server: http://vault.hashicorp-vault.svc.cluster.local:8200
+    auth:
+      kubernetes:
+        role: cert-manager-role
+        mountPath: /v1/auth/kubernetes
+        secretRef:
+          name: vault-issuer-token
+          key: token
+---
+# cert-manager Issuer for direct leaf certificates from Vault Root CA.
+# Uses pki/sign/vault-leaf-role to issue leaf certs signed directly
+# by the Root CA (no intermediate).
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: vault-pki-leaf-issuer
+  namespace: VAULT_ISSUER_NS
+spec:
+  vault:
+    path: pki/sign/vault-leaf-role
+    server: http://vault.hashicorp-vault.svc.cluster.local:8200
+    auth:
+      kubernetes:
+        role: cert-manager-role
+        mountPath: /v1/auth/kubernetes
+        secretRef:
+          name: vault-issuer-token
+          key: token
